@@ -64,18 +64,54 @@
       display: flex;
       flex-direction: column;
     }
-    .name, .msg {
-      font-size: 24px;
+    .choiceDiv >:nth-child(1) {
+      background-color: rgb(70, 16, 120);
+    }
+    .choiceDiv >:nth-child(2) {
+      background-color: rgb(0, 89, 24);
+    }
+    .choiceDiv >:nth-child(3) {
+      background-color: rgb(11, 29, 145);
+    }
+    .choiceDiv >:nth-child(4) {
+      background-color: rgb(85, 0, 0);
+    }
+
+
+    .name {
+      font-size: 28px;
       color: aqua;
+
+    }
+    .msg {
+      font-size: 24px;
+      color:blueviolet;
+    }
+    .triviaChat {
+      display: flex;
+      width: 700px;
+    }
+    .twitchChat {
+      display: flex;
+      flex-direction: column-reverse;
+      background-color: black;
+      width: 200px;
+      height: 400px;
+    }
+    .winner {
+      background-color: blue;
     }
 
     .choiceBtn {
       width: 500px;
-      height: 100px;
+      height: 80px;
       display: flex;
       flex-direction: row;
       align-content: space-between;
       background-color: black;
+    }
+    .choiceBtn:hover {
+      background-color:lightslategray;
     }
     .choiceNum {
       font-size: 48px;
@@ -85,7 +121,6 @@
     }
     .choice {
       width: 500px;
-      /* background-color: rgba(0, 0, 0, 0); */
       background-color: inherit;
       font-size: 32px;
       color: aqua;
@@ -93,8 +128,9 @@
       display: flex;
       justify-content: center;
       align-items: center;
-
     }
+
+
   </style>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -102,7 +138,14 @@
 </head>
 <body id="root">
   <div id="title" class="triviaTitle">Name That Movie!</div>
-  <div id="trivia" class="trivia" data-idx="0" ></div>
+  <div id="triviaChat" class="triviaChat">
+    <div id="trivia" class="trivia" data-idx="0" ></div>
+    <div id="twitchChat" class="twitchChat">
+      <label id="twitchName" class="name"></label>
+      <label id="chatMsg" class="msg"></label>
+    </div>
+  </div>
+
   <div id="buttons">
     <button id="prev">&lt&lt</button>
     <button id="pause">Pause</button>
@@ -113,13 +156,7 @@
     <label id="timer" class="timer"></label>
     <lable id="fps"></lable>
   </div>
-  <div id="twitchChat">
-    <label id="twitchName" class="name"></label>
-    <!-- Got the answer with -->
-    <label id="chatMsg" class="msg"></label>
-  </div>
   <div id="choiceDiv" class="choiceDiv"></div>
-
   <script src="src/movie_trivia.js"></script>
 
 </body>
