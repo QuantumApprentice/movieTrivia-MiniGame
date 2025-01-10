@@ -632,10 +632,7 @@ function showScore()
   trivia.appendChild(scoreCard);
   scoreCard.className = "scoreCard";
 
-  // const temp = {"abc" : 3, "def": 2, "ghi": 4};
-
   const scoreArr = Object.entries(score);
-  // const scoreArr = Object.entries(temp);
   scoreArr.sort((a, b)=>{
     return b[1]-a[1];
   });
@@ -663,7 +660,6 @@ function showScore()
     scoreCard.appendChild(row);
 
 
-    
     // const li = document.createElement("li");
     // li.innerText = e;
     // scoreCard.appendChild(li);
