@@ -253,6 +253,8 @@ function fpsCounter() {
 // since the page loaded
 
 let triviaQuestions = [
+  {answer:"Frankenstein",
+    question:"https://quantumapprentice.github.io/Movie-Tracker/bg/frankenstein-1931.jpg"},
   {answer:"Die Hard",
     question:"die-hard-for-sure-sure.gif"},
   {answer:"Jurassic Park",
@@ -284,13 +286,20 @@ let timerState = "running";
 function play_trivia()
 {
 
+  import(`/Movie-Tracker/src/tmdbList.json`).then((e)=>{
+    console.log("e",JSON.stringify(e));
+  })
+
+
+
   const countdownTime = 30;
   const answerTime = 15;
   let prevState;
 
   const trivia = document.getElementById("trivia");
   const out = document.createElement("img");
-  out.src = `assets/${triviaQuestions[0].question}`;
+  // out.src = `assets/${triviaQuestions[0].question}`;
+  out.src = `${triviaQuestions[0].question}`;
   out.id = "question";
   trivia.appendChild(out);
   const timer   = document.getElementById("timer");
