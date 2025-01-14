@@ -286,7 +286,7 @@ let timerState = "running";
 function play_trivia()
 {
 
-  import(`/Movie-Tracker/src/tmdbList.json`).then((e)=>{
+  import(`/Movie-Tracker/src/tmdbList.json`, { with: { type: "json" } }).then((e)=>{
     console.log("e",JSON.stringify(e));
   })
 
