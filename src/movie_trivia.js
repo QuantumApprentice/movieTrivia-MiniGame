@@ -212,7 +212,7 @@ async function play_trivia()
     if (triviaIndex < 0) {
       triviaIndex = triviaQuestions.length-1;
     }
-    out.src = `bg/${triviaQuestions[triviaIndex].question}`;
+    out.src = `/Movie-Tracker/bg/${triviaQuestions[triviaIndex].question}`;
     resetTimer();
     multipleChoice();
     // clearRound();
@@ -340,7 +340,7 @@ function createAnswers()
 
   let answersB = Array(4);
   let answerIndex = Math.floor(Math.random()*4);
-  answersB[answerIndex] = question.answer;
+  answersB[answerIndex] = {...question};
 
   for (let i = 1; i <= 3; i += 1) {
     let wrongAnswer;
