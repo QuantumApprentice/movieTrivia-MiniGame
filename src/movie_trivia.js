@@ -7,22 +7,6 @@
 //got this from stackoverflow
 //https://stackoverflow.com/questions/32509885/scan-folder-content-in-javascript
 //doesn't work, but not sure why
-function load_stuff()
-{
-  var dir = "/assets";
-  var ext = ".gif";
-  $.ajax({
-    url: dir,
-    success: (data)=>{
-      $(data).find("a:contains("+ ext + ")")
-      .each(()=>{
-          let filename = this.href.replace(window.location.host, "")
-          .replace("http:///", "");
-          $("body").append($("<img src=" + dir + filename + "></img>"));
-         });
-    }
-  });
-}
 
 let lastTime;
 function fpsCounter() {
@@ -268,6 +252,7 @@ async function createQuestions()
 
 function createAnswers()
 {
+  answered = [];  //reset so same people can answer again
 
   /////////////////////////////////////////////
   //QuantumApprentice
@@ -288,7 +273,6 @@ function createAnswers()
   // correctAnsIdx = swap+1;
   // console.log(ansArr);
 
-  answered = [];
 
   /////////////////////////////////////////////
   //BakerStaunch
@@ -296,7 +280,14 @@ function createAnswers()
   console.log("answer", question.answer);
 
   let answersB = Array(4);
-  let answerIndex = Math.floor(Math.random()*4);
+  let answerIndex;
+  //prevent same answer index from appearing twice in a row
+  do {
+    answerIndex = Math.floor(Math.random()*4);
+  } while (answerIndex == correctAnsIdx);
+  // while (answerIndex == correctAnsIdx) {
+  //   answerIndex = Math.floor(Math.random()*4);
+  // }
   correctAnsIdx = answerIndex+1;
   answersB[answerIndex] = {...question};
 
@@ -387,6 +378,7 @@ function multipleChoice() {
 
   // const timeStart = performance.now();
   const ansArr = createAnswers();
+  // console.log("ans", ansArr);
   // console.log("total time: ", performance.now() - timeStart);
 
   //create array of answer buttons - choiceBtnArr[]
@@ -585,6 +577,7 @@ wsTwitch.onmessage = (fullmsg) => {
 }
 
 let answered = [];
+let winners  = [];
 function parseTriviaChat(name, outmsg)
 {
   if (triviaIndex >= triviaQuestions.length) {
@@ -593,16 +586,21 @@ function parseTriviaChat(name, outmsg)
   if (answered.includes(name)) {
     return false;
   }
+  if (winners[triviaIndex]?.includes(name)) {
+    return false;
+  }
   // console.log("outmsg: ", outmsg);
   // console.log("answer: ", correctAnsIdx);
   if (Number(outmsg) === correctAnsIdx) {
     // timerState = "paused";
+    winners.push(name);
     endTime = performance.now();
     score[name] = score[name] ? (score[name]+=1) : 1;
     return true;
   }
   if (outmsg.toLowerCase().indexOf(triviaQuestions[triviaIndex].answer) != -1) {
-
+    winners.push(name);
+    endTime = performance.now();
     score[name] = score[name] ? (score[name]+=1) : 1;
     // score[name] = score[name] && ++score[name] || 1;
     // console.log("score", score);
@@ -671,11 +669,9 @@ function display_msg(name, outmsg, tags_obj, emote_list)
   if (hideChat) {
     if (winner) {
       let msg = document.createElement("div");
-      // msg.classList.add("Message");
       msg.classList.add("msg");
       msg.innerHTML = outmsg;
 
-      // msg.style="background-color: white";
       msg.classList.add("winner");
       auth.classList.add("winner");
 
@@ -685,14 +681,16 @@ function display_msg(name, outmsg, tags_obj, emote_list)
     }
   } else {
     let msg = document.createElement("div");
-    // msg.classList.add("Message");
     msg.classList.add("msg");
     msg.innerHTML = outmsg;
 
     if (winner) {
-      // msg.style="background-color: white";
       msg.classList.add("winner");
       auth.classList.add("winner");
+    } else {
+      if (winners[triviaIndex] == (name) || answered.includes(name)) {
+        msg.innerHTML += " -- Oops, sorry you already played this round."
+      }
     }
 
     chatMSG.append(auth, msg);
@@ -700,10 +698,10 @@ function display_msg(name, outmsg, tags_obj, emote_list)
     const chatBody = document.getElementById("twitchChat");
     chatBody.prepend(chatMSG);
   }
-
   chatMSG.classList.add("message_box");
+
+  // if more than maxMsgCount, delete first message
   if (chatBody.children.length > maxMsgCount) {
-    // if more than maxMsgCount, delete first message
     chatBody.lastElementChild.remove();
   }
 
