@@ -58,45 +58,46 @@ function fpsCounter() {
 // is meant to be number of milliseconds 
 // since the page loaded
 
-let triviaQuestions = [
-  {answer:"Frankenstein",
-    question:"https://quantumapprentice.github.io/Movie-Tracker/bg/frankenstein-1931.jpg"},
-  {answer:"Die Hard",
-    question:"die-hard-for-sure-sure.gif"},
-  {answer:"Jurassic Park",
-    question:"jurassic-park-samuel-l-jackson.gif"},
-  {answer:"Kung Pow",
-    question:"kung-pow-thats-a-lot-of-nuts.gif"},
-  {answer:"Junior",
-    question:"junior-arnold-schwarzenegger.gif"},
-  {answer:"It's a Wonderful Life",
-    question:"its-a-wonderful-life-how-do-you-do-james-stewart.gif"},
-  {answer:"Jingle All the Way",
-    question:"jingle-all-the-way.gif"},
-  {answer:"Planes, Trains and Automobiles",
-    question:"planes-trains-and-automobiles-john-candy-devil.gif"},
-  {answer:"Rudolph the Red Nosed Reindeer", 
-    question:"rudolph-the-red-nosed-reindeer-hermie-dentist.gif"},
-  {answer:"Scrooged",
-    question:"scrooged-toaster.gif"},
-  {answer:"Spaceballs",
-    question:"spaceballs-alien-kane.gif"},
-  {answer:"Trading Places",
-    question:"trading-places-dan-aykroyd.gif"},
-];
+// let triviaQuestions = [
+//   {answer:"Frankenstein",
+//     question:"https://quantumapprentice.github.io/Movie-Tracker/bg/frankenstein-1931.jpg"},
+//   {answer:"Die Hard",
+//     question:"die-hard-for-sure-sure.gif"},
+//   {answer:"Jurassic Park",
+//     question:"jurassic-park-samuel-l-jackson.gif"},
+//   {answer:"Kung Pow",
+//     question:"kung-pow-thats-a-lot-of-nuts.gif"},
+//   {answer:"Junior",
+//     question:"junior-arnold-schwarzenegger.gif"},
+//   {answer:"It's a Wonderful Life",
+//     question:"its-a-wonderful-life-how-do-you-do-james-stewart.gif"},
+//   {answer:"Jingle All the Way",
+//     question:"jingle-all-the-way.gif"},
+//   {answer:"Planes, Trains and Automobiles",
+//     question:"planes-trains-and-automobiles-john-candy-devil.gif"},
+//   {answer:"Rudolph the Red Nosed Reindeer", 
+//     question:"rudolph-the-red-nosed-reindeer-hermie-dentist.gif"},
+//   {answer:"Scrooged",
+//     question:"scrooged-toaster.gif"},
+//   {answer:"Spaceballs",
+//     question:"spaceballs-alien-kane.gif"},
+//   {answer:"Trading Places",
+//     question:"trading-places-dan-aykroyd.gif"},
+// ];
 let triviaIndex = 0;
 let score = {};
 let endTime;
 let correctAnsIdx;
 let timerState = "running";
+let triviaQuestions;
 async function play_trivia()
 {
   const countdownTime = 30;
   const answerTime = 15;
   let prevState;
 
-  const triviaQuestions = await createQuestions();
-  // createQuestions();
+  // triviaQuestions = await createQuestions();
+  await createQuestions();
 
   const trivia = document.getElementById("trivia");
   const out = document.createElement("img");
@@ -148,7 +149,7 @@ async function play_trivia()
       return;
     }
     //change the trivia out.src to match new index
-    out.src = `assets/${triviaQuestions[triviaIndex].question}`;
+    out.src = `bg/${triviaQuestions[triviaIndex].question}`;
     //reset for next round
     resetTimer();
     multipleChoice();
@@ -211,7 +212,7 @@ async function play_trivia()
     if (triviaIndex < 0) {
       triviaIndex = triviaQuestions.length-1;
     }
-    out.src = `assets/${triviaQuestions[triviaIndex].question}`;
+    out.src = `bg/${triviaQuestions[triviaIndex].question}`;
     resetTimer();
     multipleChoice();
     // clearRound();
@@ -228,10 +229,10 @@ async function play_trivia()
   stateMachine();
 }
 
+let tmdbList;
 async function createQuestions()
 {
   //https://raw.githubusercontent.com/{username}/{project}/{file}
-  let tmdbList;
   try {
     // const res = await fetch("/Movie-Tracker/src/tmdbList.json");
     const res = await fetch(`https://raw.githubusercontent.com/QuantumApprentice/Movie-Tracker/refs/heads/master/src/tmdbList.json`)
@@ -243,35 +244,87 @@ async function createQuestions()
   } catch (err) {
     console.error(err.message);
   }
-  console.log("tmdbList", tmdbList);
+  // console.log("tmdbList", tmdbList);
 
 
-  let questionIndex = Math.floor(Math.random() * tmdbList.length);
-  // let question = triviaQuestions[questionIndex]; //does not modify original array
-  let question = {
-    answer: tmdbList[questionIndex].title,
-    question: tmdbList[questionIndex].bg
+  //WillFM
+  // let triviaQuestions = theJson.map(json => { 
+  // answer: json.title, question: `/movie-tracker/bg/{json.id}.jpg` 
+  // })
+  //////////////////////////////
+  //also WillFM
+  // function reservoirSample(arr, k) {
+  //   return arr.reduce((reservoir, val, i) => {
+  //     if (i < k) {
+  //       // fill initial reservoir
+  //       reservoir[i] = val;
+  //     } else {
+  //       // random replacement
+  //       const j = Math.floor(Math.random() * (i + 1)); 
+  //       if (j < k) reservoir[j] = val;
+  //     } return reservoir;
+  //   }, new Array(k));
+  // }
+  // console.log("t", reservoirSample(tmdbList, 10));
+
+
+
+
+
+
+  // let questionIndex = Math.floor(Math.random() * tmdbList.length);
+  // let questionInit = {
+  //   answer: tmdbList[questionIndex].title,
+  //   question: tmdbList[questionIndex].bg
+  // }
+
+  let indexArr = new Array(10);
+  for (let i = 0; i < 10; i++) {
+    let currIndex;
+    do {
+      currIndex = Math.floor(Math.random() * tmdbList.length);
+    } while (
+      indexArr.includes(currIndex)
+      || !tmdbList[currIndex].bg
+    );
+    indexArr[i] = currIndex;
   }
-  let answerIndex = Math.floor(Math.random()*4);
-  let answersB = Array(4);
-  answersB[answerIndex] = question.answer;
-  for (let i = 1; i <= 3; i += 1) {
-    let wrongAnswer;
-    while (answersB.includes(wrongAnswer)) {
-      //get another random answer and 
-      //set it at index (answerIndex + i) % 4
 
-      let rng = Math.floor(Math.random() * tmdbList.length);
-      // wrongAnswer = tmdbList[rng].answer;
-      wrongAnswer = {
-        answer: tmdbList[rng].title,
-        question: tmdbList[rng].bg
-      }
+
+  triviaQuestions = indexArr.map((e)=>{
+    return {
+      answer: tmdbList[e].title,
+      question: tmdbList[e].bg
     }
-    answersB[(answerIndex + i) %4] = wrongAnswer;
-  }
-  console.log('answersB', answersB);
-  return answersB;
+  });
+
+  console.log("temp", triviaQuestions);
+
+
+
+
+  // let answerIndex = Math.floor(Math.random()*4);
+  // let answersB = Array(4);
+  // answersB[answerIndex] = question.answer;
+  // for (let i = 1; i <= 3; i += 1) {
+  //   let wrongAnswer;
+  //   while (answersB.includes(wrongAnswer)) {
+  //     //get another random answer and 
+  //     //set it at index (answerIndex + i) % 4
+
+  //     let rng = Math.floor(Math.random() * tmdbList.length);
+  //     // wrongAnswer = tmdbList[rng].answer;
+  //     wrongAnswer = {
+  //       answer: tmdbList[rng].title,
+  //       question: tmdbList[rng].bg
+  //     }
+  //   }
+  //   answersB[(answerIndex + i) %4] = wrongAnswer;
+  // }
+  // console.log('answersB', answersB);
+  // triviaIndex = questionIndex;
+  // return temp;
+  // return answersB;
 }
 
 function createAnswers()
@@ -279,21 +332,21 @@ function createAnswers()
 
   /////////////////////////////////////////////
   //QuantumApprentice
-  let answers = new Set();
-  let ansArr = [triviaQuestions[triviaIndex].answer];
-  answers.add(triviaQuestions[triviaIndex].answer);
-  while (answers.size < 4) {
-    let randAnswer = triviaQuestions[Math.floor(Math.random() * triviaQuestions.length)].answer;
-    if (!answers.has(randAnswer)) {
-      answers.add(randAnswer);
-      ansArr.push(randAnswer);
-    }
-  }
-  let swap = Math.floor(Math.random()*4);
-  let temp = ansArr[swap];
-  ansArr[0] = temp;
-  ansArr[swap] = triviaQuestions[triviaIndex].answer;
-  correctAnsIdx = swap+1;
+  // let answers = new Set();
+  // let ansArr = [triviaQuestions[triviaIndex].answer];
+  // answers.add(triviaQuestions[triviaIndex].answer);
+  // while (answers.size < 4) {
+  //   let randAnswer = triviaQuestions[Math.floor(Math.random() * triviaQuestions.length)].answer;
+  //   if (!answers.has(randAnswer)) {
+  //     answers.add(randAnswer);
+  //     ansArr.push(randAnswer);
+  //   }
+  // }
+  // let swap = Math.floor(Math.random()*4);
+  // let temp = ansArr[swap];
+  // ansArr[0] = temp;
+  // ansArr[swap] = triviaQuestions[triviaIndex].answer;
+  // correctAnsIdx = swap+1;
   // console.log(ansArr);
 
 
@@ -303,6 +356,10 @@ function createAnswers()
 
   // let [question] = triviaQuestions.splice(questionIndex, 1); //modifies array
   let question = triviaQuestions[questionIndex]; //does not modify original array
+  // let question = {
+  //   answer: tmdbList[questionIndex].title,
+  //   question: tmdbList[questionIndex].bg
+  // }
 
   let answersB = Array(4);
   let answerIndex = Math.floor(Math.random()*4);
@@ -315,9 +372,13 @@ function createAnswers()
       //set it at index (answerIndex + i) % 4
       let rng = Math.floor(Math.random() * triviaQuestions.length);
       wrongAnswer = triviaQuestions[rng].answer;
+      // let rng = Math.floor(Math.random() * tmdbList.length);
+      // wrongAnswer = tmdbList[rng].answer;
     }
     answersB[(answerIndex + i) %4] = wrongAnswer;
   }
+
+  const ansArr = answersB;
 
   // console.log(answersB)
 
@@ -350,20 +411,20 @@ function createAnswers()
   //tvjosh
   /////////////////////////////////////////////
   // const ls = Array(10).fill().map((_, i) => i);
-  const ls = triviaQuestions;
-  const numToShuffle = 4;
+  // const ls = triviaQuestions;
+  // const numToShuffle = 4;
 
-  const copyLs = ls.slice().map((x, i, thisLs) => {
-    if (i < numToShuffle) {
-      // const k = Math.floor(Math.random() * (ls.length/numToShuffle) + i*(ls.length/numToShuffle));
-      const k = Math.floor(Math.random() * (ls.length - i)) + i;
-      const t = thisLs[i];
-      thisLs[i] = thisLs[k];
-      thisLs[k] = t;
-      return thisLs[i];
-    }
-    return x
-  }).slice(0, numToShuffle);
+  // const copyLs = ls.slice().map((x, i, thisLs) => {
+  //   if (i < numToShuffle) {
+  //     // const k = Math.floor(Math.random() * (ls.length/numToShuffle) + i*(ls.length/numToShuffle));
+  //     const k = Math.floor(Math.random() * (ls.length - i)) + i;
+  //     const t = thisLs[i];
+  //     thisLs[i] = thisLs[k];
+  //     thisLs[k] = t;
+  //     return thisLs[i];
+  //   }
+  //   return x
+  // }).slice(0, numToShuffle);
 
   // console.log(copyLs);
 
