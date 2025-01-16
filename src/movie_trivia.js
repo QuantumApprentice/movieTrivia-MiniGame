@@ -243,38 +243,6 @@ async function createQuestions()
     console.error(err.message);
   }
 
-
-  //WillFM
-  // let triviaQuestions = theJson.map(json => { 
-  // answer: json.title, question: `/movie-tracker/bg/{json.id}.jpg` 
-  // })
-  //////////////////////////////
-  //also WillFM
-  // function reservoirSample(arr, k) {
-  //   return arr.reduce((reservoir, val, i) => {
-  //     if (i < k) {
-  //       // fill initial reservoir
-  //       reservoir[i] = val;
-  //     } else {
-  //       // random replacement
-  //       const j = Math.floor(Math.random() * (i + 1)); 
-  //       if (j < k) reservoir[j] = val;
-  //     } return reservoir;
-  //   }, new Array(k));
-  // }
-  // console.log("t", reservoirSample(tmdbList, 10));
-
-
-
-
-
-
-  // let questionIndex = Math.floor(Math.random() * tmdbList.length);
-  // let questionInit = {
-  //   answer: tmdbList[questionIndex].title,
-  //   question: tmdbList[questionIndex].bg
-  // }
-
   let indexArr = new Array(10);
   for (let i = 0; i < 10; i++) {
     let currIndex;
@@ -323,18 +291,12 @@ function createAnswers()
 
   /////////////////////////////////////////////
   //BakerStaunch
-  // let questionIndex = Math.floor(Math.random() * triviaQuestions.length);
-  // let question = triviaQuestions[triviaIndex];
-  // triviaIndex++;
-  let questionIndex = triviaIndex;
-
-  // let [question] = triviaQuestions.splice(questionIndex, 1); //modifies array
-  let question = triviaQuestions[questionIndex]; //does not modify original array
-  console.log("q", question);
-  console.log("i", questionIndex);
+  let question = triviaQuestions[triviaIndex]; //does not modify original array
+  // console.log("answer", question.answer);
 
   let answersB = Array(4);
   let answerIndex = Math.floor(Math.random()*4);
+  correctAnsIdx = answerIndex+1;
   answersB[answerIndex] = {...question};
 
   for (let i = 1; i <= 3; i += 1) {
@@ -342,10 +304,7 @@ function createAnswers()
     while (answersB.includes(wrongAnswer)) {
       //get another random answer and 
       //set it at index (answerIndex + i) % 4
-      // let rng = Math.floor(Math.random() * triviaQuestions.length);
-      // wrongAnswer = triviaQuestions[rng].answer;
       let rng = Math.floor(Math.random() * tmdbList.length);
-      // wrongAnswer = tmdbList[rng].answer;
       wrongAnswer = {
         answer: tmdbList[rng].title,
         question: tmdbList[rng].bg
@@ -355,7 +314,6 @@ function createAnswers()
   }
 
   const ansArr = answersB;
-
   // console.log(answersB)
 
   //Eskiminha (chatGPT)
@@ -389,7 +347,6 @@ function createAnswers()
   // const ls = Array(10).fill().map((_, i) => i);
   // const ls = triviaQuestions;
   // const numToShuffle = 4;
-
   // const copyLs = ls.slice().map((x, i, thisLs) => {
   //   if (i < numToShuffle) {
   //     // const k = Math.floor(Math.random() * (ls.length/numToShuffle) + i*(ls.length/numToShuffle));
@@ -401,7 +358,6 @@ function createAnswers()
   //   }
   //   return x
   // }).slice(0, numToShuffle);
-
   // console.log(copyLs);
 
 
@@ -409,14 +365,11 @@ function createAnswers()
   //FrankL81
   // const Questions = triviaQuestions;
   // console.log(Questions);
-
   // const schuffle = (array) => array.sort(() => Math.random() < 0.5 ? 1 : -1);
   // const currentQuestion = schuffle(Questions).slice(0,4).map((e)=>e.answer);
   // // const [imgSrc,answer] = currentQuestion[0];
-
   // ansArr = currentQuestion;
   // console.log("ansArr", ansArr);
-
   //   document.getElementById("canvas").innerHTML = 
   // `<img alt="${imgSrc}" height="40px" src="${imgSrc}" /><br/> ${schuffle(currentQuestion.map(([,answer],idx) => `<button>${idx+1} ${answer}</button>`)).join("<br />")}
   // <br /><br />
@@ -434,7 +387,7 @@ function multipleChoice() {
   // const timeStart = performance.now();
   const ansArr = createAnswers();
   // console.log("total time: ", performance.now() - timeStart);
-  console.log('a', ansArr);
+  // console.log('a', ansArr);
 
   //create array of answer buttons - choiceBtnArr[]
   //and fill with ansArr[] answers
@@ -466,7 +419,6 @@ function multipleChoice() {
   function handleClick(e) {
     //if button has the correct answer...
     if (e.target.firstChild.data === triviaQuestions[triviaIndex].answer) {
-
       //change "answer" button text to match next element
       //display correct answer in timer
       const answerBtn = document.getElementById("answer");
@@ -481,7 +433,6 @@ function multipleChoice() {
   }
 
   choiceBtnArr.map((e, i)=>{
-    // e.style = `background-color: ${bgColors[i]}`;
     choiceDiv.append(e);
   });
 
@@ -512,11 +463,10 @@ function showScore()
   nextBtn.disabled = true;
   prevBtn.disabled = true;
   pausBtn.disabled = true;
-  // answBtn.disabled = true;
   setTimeout(()=>{
     answBtn.innerText = "Restart?";
   }, 10);
-  console.log("answer:", answBtn.innerText);
+  // console.log("answer:", answBtn.innerText);
   answBtn.onclick = ()=>{
     location.reload();
   }
@@ -545,27 +495,13 @@ function showScore()
 
     td1.style = `color : rgb(${r}, ${g}, ${b});`;
 
-
-
     td2.innerText = e[1];
     td2.className = "scoreAmount";
 
     row.appendChild(td1);
     row.appendChild(td2);
     scoreCard.appendChild(row);
-
-
-    // const li = document.createElement("li");
-    // li.innerText = e;
-    // scoreCard.appendChild(li);
   });
-
-  // console.log(Object.entries(score));
-  // const li = document.createElement("li");
-  // li.innerText = Object.entries(score);
-  // scoreCard.appendChild(li);
-  
-  
 }
 
 
