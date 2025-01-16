@@ -232,11 +232,9 @@ async function play_trivia()
 let tmdbList;
 async function createQuestions()
 {
-  //https://raw.githubusercontent.com/{username}/{project}/{file}
   try {
     // const res = await fetch("/Movie-Tracker/src/tmdbList.json");
     const res = await fetch(`https://raw.githubusercontent.com/QuantumApprentice/Movie-Tracker/refs/heads/master/src/tmdbList.json`)
-    // const res = await fetch("/src/tmdbList.json");
     if (!res.ok) {
       throw new Error(`Response failed? ${res.status}`);
     }
@@ -244,7 +242,6 @@ async function createQuestions()
   } catch (err) {
     console.error(err.message);
   }
-  // console.log("tmdbList", tmdbList);
 
 
   //WillFM
@@ -328,15 +325,13 @@ function createAnswers()
   //BakerStaunch
   // let questionIndex = Math.floor(Math.random() * triviaQuestions.length);
   // let question = triviaQuestions[triviaIndex];
-  triviaIndex++;
+  // triviaIndex++;
   let questionIndex = triviaIndex;
 
   // let [question] = triviaQuestions.splice(questionIndex, 1); //modifies array
   let question = triviaQuestions[questionIndex]; //does not modify original array
-  // let question = {
-  //   answer: tmdbList[questionIndex].title,
-  //   question: tmdbList[questionIndex].bg
-  // }
+  console.log("q", question);
+  console.log("i", questionIndex);
 
   let answersB = Array(4);
   let answerIndex = Math.floor(Math.random()*4);
@@ -677,7 +672,7 @@ function parseTriviaChat(name, outmsg)
     // console.log("score", score);
     return true;
   }
-  if (!isNaN(outmsg)) {
+  if (!isNaN(outmsg) && (Number(outmsg) > 0 && Number(outmsg) < 5)) {
     answered.push(name);
     return false;
   }
