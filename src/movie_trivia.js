@@ -288,11 +288,12 @@ function createAnswers()
   // correctAnsIdx = swap+1;
   // console.log(ansArr);
 
+  answered = [];
 
   /////////////////////////////////////////////
   //BakerStaunch
   let question = triviaQuestions[triviaIndex]; //does not modify original array
-  // console.log("answer", question.answer);
+  console.log("answer", question.answer);
 
   let answersB = Array(4);
   let answerIndex = Math.floor(Math.random()*4);
@@ -387,7 +388,6 @@ function multipleChoice() {
   // const timeStart = performance.now();
   const ansArr = createAnswers();
   // console.log("total time: ", performance.now() - timeStart);
-  // console.log('a', ansArr);
 
   //create array of answer buttons - choiceBtnArr[]
   //and fill with ansArr[] answers
