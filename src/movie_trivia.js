@@ -298,33 +298,7 @@ async function createQuestions()
     }
   });
 
-  console.log("temp", triviaQuestions);
-
-
-
-
-  // let answerIndex = Math.floor(Math.random()*4);
-  // let answersB = Array(4);
-  // answersB[answerIndex] = question.answer;
-  // for (let i = 1; i <= 3; i += 1) {
-  //   let wrongAnswer;
-  //   while (answersB.includes(wrongAnswer)) {
-  //     //get another random answer and 
-  //     //set it at index (answerIndex + i) % 4
-
-  //     let rng = Math.floor(Math.random() * tmdbList.length);
-  //     // wrongAnswer = tmdbList[rng].answer;
-  //     wrongAnswer = {
-  //       answer: tmdbList[rng].title,
-  //       question: tmdbList[rng].bg
-  //     }
-  //   }
-  //   answersB[(answerIndex + i) %4] = wrongAnswer;
-  // }
-  // console.log('answersB', answersB);
-  // triviaIndex = questionIndex;
-  // return temp;
-  // return answersB;
+  // console.log("temp", triviaQuestions);
 }
 
 function createAnswers()
@@ -352,7 +326,10 @@ function createAnswers()
 
   /////////////////////////////////////////////
   //BakerStaunch
-  let questionIndex = Math.floor(Math.random() * triviaQuestions.length);
+  // let questionIndex = Math.floor(Math.random() * triviaQuestions.length);
+  // let question = triviaQuestions[triviaIndex];
+  triviaIndex++;
+  let questionIndex = triviaIndex;
 
   // let [question] = triviaQuestions.splice(questionIndex, 1); //modifies array
   let question = triviaQuestions[questionIndex]; //does not modify original array
@@ -370,10 +347,14 @@ function createAnswers()
     while (answersB.includes(wrongAnswer)) {
       //get another random answer and 
       //set it at index (answerIndex + i) % 4
-      let rng = Math.floor(Math.random() * triviaQuestions.length);
-      wrongAnswer = triviaQuestions[rng].answer;
-      // let rng = Math.floor(Math.random() * tmdbList.length);
+      // let rng = Math.floor(Math.random() * triviaQuestions.length);
+      // wrongAnswer = triviaQuestions[rng].answer;
+      let rng = Math.floor(Math.random() * tmdbList.length);
       // wrongAnswer = tmdbList[rng].answer;
+      wrongAnswer = {
+        answer: tmdbList[rng].title,
+        question: tmdbList[rng].bg
+      }
     }
     answersB[(answerIndex + i) %4] = wrongAnswer;
   }
@@ -455,9 +436,10 @@ function multipleChoice() {
   const choiceDiv = document.getElementById("choiceDiv");
   choiceDiv.innerHTML = "";
 
-  const timeStart = performance.now();
+  // const timeStart = performance.now();
   const ansArr = createAnswers();
-  console.log("total time: ", performance.now() - timeStart);
+  // console.log("total time: ", performance.now() - timeStart);
+  console.log('a', ansArr);
 
   //create array of answer buttons - choiceBtnArr[]
   //and fill with ansArr[] answers
@@ -471,7 +453,7 @@ function multipleChoice() {
 
     const choiceAns = document.createElement("div");
     choiceAns.className = "choice";
-    choiceAns.innerText = `${ansArr[i]}`;
+    choiceAns.innerText = `${ansArr[i].answer}`;
 
     const choiceNum = document.createElement("div");
     choiceNum.innerText = `${i+1}`;
