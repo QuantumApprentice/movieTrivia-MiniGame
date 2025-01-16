@@ -149,7 +149,7 @@ async function play_trivia()
       return;
     }
     //change the trivia out.src to match new index
-    out.src = `bg/${triviaQuestions[triviaIndex].question}`;
+    out.src = `/Movie-Tracker/bg/${triviaQuestions[triviaIndex].question}`;
     //reset for next round
     resetTimer();
     multipleChoice();
