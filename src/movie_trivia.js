@@ -24,200 +24,6 @@ function load_stuff()
   });
 }
 
-async function play_movie_trivia()
-{
-
-  let triviaQuestions = [
-    "die-hard-for-sure-sure.gif",
-    "jurassic-park-samuel-l-jackson.gif",
-    "kung-pow-thats-a-lot-of-nuts.gif",
-    "junior-arnold-schwarzenegger.gif",
-    "its-a-wonderful-life-how-do-you-do-james-stewart.gif",
-    "jingle-all-the-way.gif",
-    "planes-trains-and-automobiles-john-candy-devil.gif",
-    "rudolph-the-red-nosed-reindeer-hermie-dentist.gif",
-    "scrooged-toaster.gif",
-    "spaceballs-alien-kane.gif",
-    "trading-places-dan-aykroyd.gif",
-  ];
-  const countdownTime = 30;
-  const answerTime = 15;
-
-  const trivia = document.getElementById("trivia");
-  const out = document.createElement("img");
-  trivia.appendChild(out);
-
-  let triviaTimer;
-  let triviaTimeout;
-  function createAnswer(index) {
-    // console.log("index", index+1);
-    index = Number(index);
-    let answer = document.getElementById("timer");
-    answer.innerText = triviaQuestions[index];
-
-    const button = document.getElementById("answer");
-    // if (button.innerText == "Answer") {
-    //   button.innerText = "Next";
-    // } else {
-    //   button.innerText = "Answer";
-    // }
-
-
-
-    return setTimeout(()=>{
-
-
-      if (button.innerText == "Next") {
-        button.innerText = "Answer";
-      }
-      answer.innerText = countdownTime;
-      createTrivia(index+1);
-
-
-
-    }, 1000*answerTime);
-  }
-
-
-
-  function startTimer(countdown) {
-
-    clearInterval(triviaTimer);
-    let nextCountdown = new Date().getTime() + 1000 * countdown
-    let timer = document.getElementById("timer");
-    timer.innerText = countdown;
-
-    const trivia = document.getElementById("trivia");
-
-
-
-
-    return setInterval(()=>{
-      let now = new Date().getTime();
-
-      const answerButton = document.getElementById("answer");
-
-      if (answerButton.innerText == "Next") {
-        const index = trivia.dataset.idx;
-        trivia.innerText = triviaQuestions[index]
-      }
-
-
-
-
-      timer.innerText = Math.floor((nextCountdown - now)%(1000*60)/1000);
-
-      if (timer.innerText <= 0) {
-        const index = document.getElementById("trivia").dataset.idx;
-        clearInterval(triviaTimer);
-        triviaTimeout = createAnswer(index);
-      }
-
-
-
-    }, 1000);
-  }
-
-  function createTrivia(index) {
-    // console.log("index", index);
-    index = Number(index);
-    if (index >= triviaQuestions.length) {
-      index = 0;
-      //TODO: need to make "end" slide w/score
-    }
-    // console.log("index", index);
-    out.src = `assets/${triviaQuestions[index]}`;
-    trivia.dataset.idx = index;
-    triviaTimer = startTimer(countdownTime);
-  }
-
-  createTrivia(0);
-
-
-
-
-  let pause = document.getElementById("pause");
-  pause.onclick = (e)=>{
-    if (e.target.innerText == "Pause") {
-      clearInterval(triviaTimer);
-      e.target.innerText = "Play";
-    } else {
-      e.target.innerText = "Pause";
-      let time = document.getElementById("timer").innerText;
-      triviaTimer = startTimer(time);
-    }
-  }
-
-
-
-
-
-
-  let answer  = document.getElementById("answer");
-  answer.onclick = (e)=>{
-    // let object = {a:1};
-    // console.dir("dir", object);
-    // console.log("log", object);
-
-    // object.a = 2;
-    // console.dir("dir", object);
-    // console.log("log", object);
-    // console.table("table", object);
-    // console.count("count", object);
-
-    // var people = [ 
-    //   { first: 'René', last: 'Magritte', },
-    //   { first: 'Chaim', last: 'Soutine', birthday: '18930113', }, 
-    //   { first: 'Henri', last: 'Matisse', } 
-    // ];
-    // console.table({people});
-    // console.log({people});
-
-
-    if (triviaTimer) {
-      clearInterval(triviaTimer);
-    }
-    // const answer = document.getElementById("answer");
-    if (e.target.innerText == "Answer") {
-      e.target.innerText = "Next";
-      const index = document.getElementById("trivia").dataset.idx;
-      triviaTimeout = createAnswer(index);
-    } else {
-      e.target.innerText = "Answer";
-      const index = Number(document.getElementById("trivia").dataset.idx);
-      clearTimeout(triviaTimeout);
-      createTrivia(index+1);
-    }
-  }
-
-  const prev = document.getElementById("prev");
-  prev.onclick = ()=>{
-    clearInterval(triviaTimer);
-    let index = Number(document.getElementById("trivia").dataset.idx);
-    // console.log("index", index);
-    if (index-1 < 0) {
-      index = triviaQuestions.length;
-    }
-    createTrivia(index-1);
-  }
-
-  const next = document.getElementById("next");
-  next.onclick = ()=>{
-    clearInterval(triviaTimer);
-    let index = Number(document.getElementById("trivia").dataset.idx);
-    if (index >= triviaQuestions.length) {
-      index = 0;
-    } else {
-      index = index + 1;
-    }
-    createTrivia(index);
-  }
-
-
-
-
-}
-
 let lastTime;
 function fpsCounter() {
   let currentTime = new Date().getTime();
@@ -283,23 +89,19 @@ let score = {};
 let endTime;
 let correctAnsIdx;
 let timerState = "running";
-function play_trivia()
+async function play_trivia()
 {
-
-  import(`/Movie-Tracker/src/tmdbList.json`, { with: { type: "json" } }).then((e)=>{
-    console.log("e",JSON.stringify(e));
-  })
-
-
-
   const countdownTime = 30;
   const answerTime = 15;
   let prevState;
 
+  const triviaQuestions = await createQuestions();
+  // createQuestions();
+
   const trivia = document.getElementById("trivia");
   const out = document.createElement("img");
   // out.src = `assets/${triviaQuestions[0].question}`;
-  out.src = `${triviaQuestions[0].question}`;
+  out.src = `/Movie-Tracker/bg/${triviaQuestions[0].question}`;
   out.id = "question";
   trivia.appendChild(out);
   const timer   = document.getElementById("timer");
@@ -426,7 +228,52 @@ function play_trivia()
   stateMachine();
 }
 
-function createAnswers() {
+async function createQuestions()
+{
+  let tmdbList;
+  try {
+    const res = await fetch("/Movie-Tracker/src/tmdbList.json");
+    // const res = await fetch("/src/tmdbList.json");
+    if (!res.ok) {
+      throw new Error(`Response failed? ${res.status}`);
+    }
+    tmdbList = await res.json();
+  } catch (err) {
+    console.error(err.message);
+  }
+  console.log("tmdbList", tmdbList);
+
+
+  let questionIndex = Math.floor(Math.random() * tmdbList.length);
+  // let question = triviaQuestions[questionIndex]; //does not modify original array
+  let question = {
+    answer: tmdbList[questionIndex].title,
+    question: tmdbList[questionIndex].bg
+  }
+  let answerIndex = Math.floor(Math.random()*4);
+  let answersB = Array(4);
+  answersB[answerIndex] = question.answer;
+  for (let i = 1; i <= 3; i += 1) {
+    let wrongAnswer;
+    while (answersB.includes(wrongAnswer)) {
+      //get another random answer and 
+      //set it at index (answerIndex + i) % 4
+
+      let rng = Math.floor(Math.random() * tmdbList.length);
+      // wrongAnswer = tmdbList[rng].answer;
+      wrongAnswer = {
+        answer: tmdbList[rng].title,
+        question: tmdbList[rng].bg
+      }
+    }
+    answersB[(answerIndex + i) %4] = wrongAnswer;
+  }
+  console.log('answersB', answersB);
+  return answersB;
+}
+
+function createAnswers()
+{
 
   /////////////////////////////////////////////
   //QuantumApprentice
@@ -468,7 +315,6 @@ function createAnswers() {
       wrongAnswer = triviaQuestions[rng].answer;
     }
     answersB[(answerIndex + i) %4] = wrongAnswer;
-
   }
 
   // console.log(answersB)
