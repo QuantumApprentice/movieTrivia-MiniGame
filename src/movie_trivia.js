@@ -579,15 +579,12 @@ let winners  = [];
 function parseTriviaChat(name, outmsg)
 {
   if (triviaIndex >= triviaQuestions.length) {
-    // return false;
-    return {won: false, str: ""}; //should show scoreboard
+    return {won: false, str: ""};   //should show scoreboard
   }
   if (answered.includes(name)) {
-    // return false;
     return {won: false, str: " -- Oops, you already played this round."};   //already answered incorrectly
   }
-  if (winners[triviaIndex]?.includes(name)) {
-    // return false;
+  if (winners[triviaIndex]) {
     return {won: false, str: ""};   //already won the round?
   }
   // console.log("outmsg: ", outmsg);
@@ -596,24 +593,19 @@ function parseTriviaChat(name, outmsg)
     winners.push(name);
     endTime = performance.now();
     score[name] = score[name] ? (score[name]+=1) : 1;
-    // return true;
     return {won: true, str: ""};    //winner through multiple choice
   }
+  console.log("o", outmsg.toLowerCase());
   if (outmsg.toLowerCase().indexOf(triviaQuestions[triviaIndex].answer) != -1) {
     winners.push(name);
     endTime = performance.now();
     score[name] = score[name] ? (score[name]+=1) : 1;
-    // score[name] = score[name] && ++score[name] || 1;
-    // console.log("score", score);
-    // return true;
     return {won: true, str: " -- Oh wow, you actually typed it out?"};    //won by typing name?
   }
   if (!isNaN(outmsg) && (Number(outmsg) > 0 && Number(outmsg) < 5)) {
     answered.push(name);
-    // return false;
     return {won: false, str: " -- Sorry, you didn't win this time."};
   }
-  // return false;
   return {won: false, str: ""};   //all regular chat
 }
 
@@ -623,21 +615,16 @@ function display_msg(name, outmsg, tags_obj, emote_list)
 {
   let emote;
   let chatMSG = document.createElement("div");
-  // let chatMSG = document.getElementById("chatMsg");
 
   if (outmsg.startsWith('\x01ACTION')) {
     outmsg = outmsg.substring(7, outmsg.length - 1).trim();
-    // msg_is_emote = true;
-
     chatMSG.classList.add('msg_is_emote');
   }
 
   let auth = document.createElement("div");
-  // auth.classList.add("Name");
   auth.classList.add("name");
 
   if (tags_obj?.color) {
-    // auth.style.color = tags_obj['color'];
     chatMSG.style.setProperty('--name-color', tags_obj['color']);
   }
 
@@ -696,13 +683,8 @@ function display_msg(name, outmsg, tags_obj, emote_list)
     if (winner.won) {
       msg.classList.add("winner");
       auth.classList.add("winner");
-
-      console.log("str", winner);
-      msg.innerText += winner.str;
-    } else {
-      console.log("msg", msg);
-      msg.innerText += winner.str;
     }
+    msg.innerText += winner.str;
 
     chatMSG.append(auth, msg);
     // chat message has to be prepended to appear on bottom
