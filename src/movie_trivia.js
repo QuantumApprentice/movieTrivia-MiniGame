@@ -284,10 +284,8 @@ function createAnswers()
   //prevent same answer index from appearing twice in a row
   do {
     answerIndex = Math.floor(Math.random()*4);
-  } while (answerIndex == correctAnsIdx);
-  // while (answerIndex == correctAnsIdx) {
-  //   answerIndex = Math.floor(Math.random()*4);
-  // }
+  } while (answerIndex == correctAnsIdx-1);
+
   correctAnsIdx = answerIndex+1;
   answersB[answerIndex] = {...question};
 
@@ -581,22 +579,25 @@ let winners  = [];
 function parseTriviaChat(name, outmsg)
 {
   if (triviaIndex >= triviaQuestions.length) {
-    return false;
+    // return false;
+    return {won: false, str: ""}; //should show scoreboard
   }
   if (answered.includes(name)) {
-    return false;
+    // return false;
+    return {won: false, str: " -- Oops, you already played this round."};   //already answered incorrectly
   }
   if (winners[triviaIndex]?.includes(name)) {
-    return false;
+    // return false;
+    return {won: false, str: ""};   //already won the round?
   }
   // console.log("outmsg: ", outmsg);
   // console.log("answer: ", correctAnsIdx);
   if (Number(outmsg) === correctAnsIdx) {
-    // timerState = "paused";
     winners.push(name);
     endTime = performance.now();
     score[name] = score[name] ? (score[name]+=1) : 1;
-    return true;
+    // return true;
+    return {won: true, str: ""};    //winner through multiple choice
   }
   if (outmsg.toLowerCase().indexOf(triviaQuestions[triviaIndex].answer) != -1) {
     winners.push(name);
@@ -604,18 +605,19 @@ function parseTriviaChat(name, outmsg)
     score[name] = score[name] ? (score[name]+=1) : 1;
     // score[name] = score[name] && ++score[name] || 1;
     // console.log("score", score);
-    return true;
+    // return true;
+    return {won: true, str: " -- Oh wow, you actually typed it out?"};    //won by typing name?
   }
   if (!isNaN(outmsg) && (Number(outmsg) > 0 && Number(outmsg) < 5)) {
     answered.push(name);
-    return false;
+    // return false;
+    return {won: false, str: " -- Sorry, you didn't win this time."};
   }
-  return false;
+  // return false;
+  return {won: false, str: ""};   //all regular chat
 }
 
 
-// global msg_time to set timeouts on messages
-let msg_time = 0;
 // display chat message on stream
 function display_msg(name, outmsg, tags_obj, emote_list)
 {
@@ -660,6 +662,13 @@ function display_msg(name, outmsg, tags_obj, emote_list)
     parts.unshift(esc_html(outmsg.slice(0, end_indx)));
     outmsg = parts.join('');
   }
+
+
+
+
+
+
+
   const winner = parseTriviaChat(name, outmsg);
 
   //option to hide chat except for
@@ -667,7 +676,7 @@ function display_msg(name, outmsg, tags_obj, emote_list)
   const chatBody = document.getElementById("twitchChat");
   let hideChat = false;
   if (hideChat) {
-    if (winner) {
+    if (winner.won) {
       let msg = document.createElement("div");
       msg.classList.add("msg");
       msg.innerHTML = outmsg;
@@ -684,13 +693,15 @@ function display_msg(name, outmsg, tags_obj, emote_list)
     msg.classList.add("msg");
     msg.innerHTML = outmsg;
 
-    if (winner) {
+    if (winner.won) {
       msg.classList.add("winner");
       auth.classList.add("winner");
+
+      console.log("str", winner);
+      msg.innerText += winner.str;
     } else {
-      if (winners[triviaIndex] == (name) || answered.includes(name)) {
-        msg.innerHTML += " -- Oops, sorry you already played this round."
-      }
+      console.log("msg", msg);
+      msg.innerText += winner.str;
     }
 
     chatMSG.append(auth, msg);
