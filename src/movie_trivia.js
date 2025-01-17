@@ -218,7 +218,8 @@ async function createQuestions()
 {
   try {
     // const res = await fetch("/Movie-Tracker/src/tmdbList.json");
-    const res = await fetch(`https://raw.githubusercontent.com/QuantumApprentice/Movie-Tracker/refs/heads/master/src/tmdbList.json`)
+    // const res = await fetch(`https://raw.githubusercontent.com/QuantumApprentice/Movie-Tracker/refs/heads/master/src/tmdbList.json`)
+    const res = await fetch("/Movie-Tracker/src/tmdbList.json");
     if (!res.ok) {
       throw new Error(`Response failed? ${res.status}`);
     }
@@ -595,7 +596,6 @@ function parseTriviaChat(name, outmsg)
     score[name] = score[name] ? (score[name]+=1) : 1;
     return {won: true, str: ""};    //winner through multiple choice
   }
-  console.log("o", outmsg.toLowerCase());
   if (outmsg.toLowerCase().indexOf(triviaQuestions[triviaIndex].answer) != -1) {
     winners.push(name);
     endTime = performance.now();
