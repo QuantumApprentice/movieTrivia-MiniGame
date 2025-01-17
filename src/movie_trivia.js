@@ -218,8 +218,7 @@ async function createQuestions()
 {
   try {
     // const res = await fetch("/Movie-Tracker/src/tmdbList.json");
-    // const res = await fetch(`https://raw.githubusercontent.com/QuantumApprentice/Movie-Tracker/refs/heads/master/src/tmdbList.json`)
-    const res = await fetch("/Movie-Tracker/src/tmdbList.json");
+    const res = await fetch(`https://raw.githubusercontent.com/QuantumApprentice/Movie-Tracker/refs/heads/master/src/tmdbList.json`)
     if (!res.ok) {
       throw new Error(`Response failed? ${res.status}`);
     }
