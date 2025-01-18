@@ -2,10 +2,9 @@
 
 // import {twitchChatConnect} from "./twitch_chat.js";
 let twitchChatConnect;
-let resetAnswered;
 import ("./twitch_chat.js").then((e)=>{
   twitchChatConnect = e.twitchChatConnect;
-  resetAnswered = e.resetAnswered;
+  // resetAnswered = e.resetAnswered;
 });
 
 let lastTime;
@@ -186,7 +185,7 @@ async function play_trivia()
     if (e.key === "Enter") {
 
       e.preventDefault();
-      startChat(e.target.value);
+      startChat(e.target.value, parseTriviaChat);
       // console.log('e', e.target.value);
     }
   });
@@ -197,10 +196,10 @@ async function play_trivia()
 }
 
 
-function startChat(chatName)
+function startChat(chatName, parseChat)
 {
   // console.log("g", globalThis.twitchChatConnect);
-  globalThis.twitchChatConnect(chatName);
+  globalThis.twitchChatConnect(chatName, parseChat);
 }
 
 
@@ -239,6 +238,47 @@ async function createQuestions()
   });
 }
 play_trivia();
+
+
+
+let answered = [];
+let winners  = [];
+function parseTriviaChat(name, outmsg)
+{
+  if (triviaIndex >= triviaQuestions.length) {
+    return {won: false, str: ""};   //should show scoreboard
+  }
+  if (answered.includes(name)) {
+    return {won: false, str: " -- Oops, you already played this round."};   //already answered incorrectly
+  }
+  if (winners[triviaIndex]) {
+    return {won: false, str: ""};   //already won the round?
+  }
+  // console.log("outmsg: ", outmsg);
+  // console.log("answer: ", correctAnsIdx);
+  if (Number(outmsg) === correctAnsIdx) {
+    winners.push(name);
+    endTime = performance.now();
+    score[name] = score[name] ? (score[name]+=1) : 1;
+    return {won: true, str: ""};    //winner through multiple choice
+  }
+  if (outmsg.toLowerCase().indexOf(triviaQuestions[triviaIndex].answer) != -1) {
+    winners.push(name);
+    endTime = performance.now();
+    score[name] = score[name] ? (score[name]+=1) : 1;
+    return {won: true, str: " -- Oh wow, you actually typed it out?"};    //won by typing name?
+  }
+  if (!isNaN(outmsg) && (Number(outmsg) > 0 && Number(outmsg) < 5)) {
+    answered.push(name);
+    return {won: false, str: " -- Sorry, you didn't win this time."};
+  }
+  return {won: false, str: ""};   //all regular chat
+}
+
+function resetAnswered()
+{
+  answered = [];  //reset so same people can answer again
+}
 
 function createAnswers()
 {

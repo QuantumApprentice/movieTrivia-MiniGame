@@ -6,8 +6,10 @@ const maxMsgCount        = 5;
 const chatBody = (document.querySelector("#ChatMessages"));
 let wsTwitch;
 let channelName;
-export function twitchChatConnect(name)
+let parseChat;
+export function twitchChatConnect(name, chatParseCallback)
 {
+  parseChat = chatParseCallback;
   channelName = name;
   wsTwitch = new WebSocket(TwitchWebSocketUrl);
   wsTwitch.onopen = ()=>{
@@ -88,45 +90,6 @@ function onMessage(fullmsg)
 
 
 
-let answered = [];
-let winners  = [];
-function parseTriviaChat(name, outmsg)
-{
-  if (triviaIndex >= triviaQuestions.length) {
-    return {won: false, str: ""};   //should show scoreboard
-  }
-  if (answered.includes(name)) {
-    return {won: false, str: " -- Oops, you already played this round."};   //already answered incorrectly
-  }
-  if (winners[triviaIndex]) {
-    return {won: false, str: ""};   //already won the round?
-  }
-  // console.log("outmsg: ", outmsg);
-  // console.log("answer: ", correctAnsIdx);
-  if (Number(outmsg) === correctAnsIdx) {
-    winners.push(name);
-    endTime = performance.now();
-    score[name] = score[name] ? (score[name]+=1) : 1;
-    return {won: true, str: ""};    //winner through multiple choice
-  }
-  if (outmsg.toLowerCase().indexOf(triviaQuestions[triviaIndex].answer) != -1) {
-    winners.push(name);
-    endTime = performance.now();
-    score[name] = score[name] ? (score[name]+=1) : 1;
-    return {won: true, str: " -- Oh wow, you actually typed it out?"};    //won by typing name?
-  }
-  if (!isNaN(outmsg) && (Number(outmsg) > 0 && Number(outmsg) < 5)) {
-    answered.push(name);
-    return {won: false, str: " -- Sorry, you didn't win this time."};
-  }
-  return {won: false, str: ""};   //all regular chat
-}
-
-export function resetAnswered()
-{
-  answered = [];  //reset so same people can answer again
-}
-
 // display chat message on stream
 function display_msg(name, outmsg, tags_obj, emote_list)
 {
@@ -173,7 +136,7 @@ function display_msg(name, outmsg, tags_obj, emote_list)
 
 
 
-  const winner = parseTriviaChat(name, outmsg);
+  const winner = parseChat(name, outmsg);
 
   //option to hide chat except for
   //those who guess correctly
