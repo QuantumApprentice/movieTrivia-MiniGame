@@ -5,11 +5,11 @@ const TwitchWebSocketUrl = 'wss://irc-ws.chat.twitch.tv:443';
 const chatBody = (document.querySelector("#ChatMessages"));
 let wsTwitch;
 let channelName;
-let parseChat;
+let parseChatCallback;
 export function twitchChatConnect(name, chatParseCallback)
 {
-  parseChat = chatParseCallback;
   channelName = name;
+  parseChatCallback = chatParseCallback;
   wsTwitch = new WebSocket(TwitchWebSocketUrl);
   wsTwitch.onopen = ()=>{
     console.log("chat opened");
@@ -19,6 +19,11 @@ export function twitchChatConnect(name, chatParseCallback)
     console.log('WebSocket connection opened');    //debug
   }
   wsTwitch.onmessage = onMessage;
+}
+
+export function twitchChatDisconnect()
+{
+  wsTwitch.close();
 }
 
 
@@ -127,5 +132,5 @@ function display_msg(name, outmsg, tags_obj, emote_list)
     outmsg = parts.join('');
   }
 
-  parseChat(name, outmsg, auth, chatMSG);
+  parseChatCallback(name, outmsg, auth, chatMSG);
 }

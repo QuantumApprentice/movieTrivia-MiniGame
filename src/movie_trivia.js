@@ -1,10 +1,10 @@
 "use strict";
 
-// import {twitchChatConnect} from "./twitch_chat.js";
 let twitchChatConnect;
+let twitchChatDisconnect;
 import ("./twitch_chat.js").then((e)=>{
-  twitchChatConnect = e.twitchChatConnect;
-  // resetAnswered = e.resetAnswered;
+  twitchChatConnect    = e.twitchChatConnect;
+  twitchChatDisconnect = e.twitchChatDisconnect;
 });
 
 // let lastTime;
@@ -41,10 +41,25 @@ import ("./twitch_chat.js").then((e)=>{
 // is meant to be number of milliseconds 
 // since the page loaded
 
+const answerBtn  = document.getElementById("answer");
+const playBtn    = document.getElementById("pause");
+const prevBtn    = document.getElementById("prev");
+const nextBtn    = document.getElementById("next");
+const twitchName = document.getElementById("twitchName");
+const triviaDiv  = document.getElementById("trivia");
+const connectBtn = document.getElementById("connectChatBtn");
+const timer      = document.getElementById("timer");
+const question   = document.createElement("img");
+
+
+
+const maxMsgCount = 5;
+const countdownTime = 30;
+const answerTime = 15;
+
 let tmdbList;
 let answered = [];
 let winners  = [];
-const maxMsgCount = 5;
 
 let triviaIndex = 0;
 let score = {};
@@ -54,20 +69,19 @@ let timerState = "running";
 let triviaQuestions;
 async function play_trivia()
 {
-  const countdownTime = 30;
-  const answerTime = 15;
+
   let prevState;
 
   // triviaQuestions = await createQuestions();
   await createQuestions();
+  initButtons();
+  endTime = performance.now() + 1000*countdownTime;
 
-  const trivia = document.getElementById("trivia");
-  const out = document.createElement("img");
-  // out.src = `assets/${triviaQuestions[0].question}`;
-  out.src = `/Movie-Tracker/bg/${triviaQuestions[0].question}`;
-  out.id = "question";
-  trivia.appendChild(out);
-  const timer   = document.getElementById("timer");
+
+  // question.src = `assets/${triviaQuestions[0].question}`;
+  question.src = `/Movie-Tracker/bg/${triviaQuestions[0].question}`;
+  question.id = "question";
+  triviaDiv.appendChild(question);
   timer.innerText = countdownTime;
 
   // function updateButtons() {
@@ -81,9 +95,8 @@ async function play_trivia()
   // }
 
   function updateTimer() {
-    const pauseBtn = document.getElementById("pause");
-    pauseBtn.innerText = "Pause";
-    const answerBtn = document.getElementById("answer");
+    playBtn.innerText = "Pause";
+    // const answerBtn = document.getElementById("answer");
     if (answerBtn.innerText !== "Next") {
       const now = performance.now();
       timer.innerText = Math.floor((endTime - now)%(1000*60)/1000);
@@ -100,39 +113,7 @@ async function play_trivia()
     }
   }
 
-  function nextTrivia() {
-    //increment the trivia index
-    triviaIndex += 1;
-    if (triviaIndex >= triviaQuestions.length) {
-      timerState = "paused";
-      // clearRound();
-      document.getElementById("choiceDiv").innerHTML = "";
-      showScore();
-      return;
-    }
-    //change the trivia out.src to match new index
-    out.src = `/Movie-Tracker/bg/${triviaQuestions[triviaIndex].question}`;
-    //reset for next round
-    resetTimer();
-    multipleChoice();
-    // clearRound();
-  }
-
-  function restartTimer() {
-    const countdown = document.getElementById("timer").innerText;
-    if (Number(countdown)) {
-      endTime = performance.now() + 1000*countdown;
-    }
-    timerState = "running";
-  }
-  function resetTimer() {
-    timer.innerText = countdownTime;
-    endTime = performance.now() + countdownTime*1000;
-    timerState = "running";
-  }
-
   function stateMachine() {
-
     if (timerState !== prevState) {
       prevState = timerState;
       // updateButtons();
@@ -140,24 +121,25 @@ async function play_trivia()
     if (timerState !== "paused") {
       updateTimer();
     }
-
     requestAnimationFrame(stateMachine);
   }
 
-  const answerBtn = document.getElementById("answer");
+  multipleChoice();
+  stateMachine();
+}
+
+function initButtons()
+{
   answerBtn.onclick = (e)=>{
     if (e.target.innerText === "Answer") {
-      //change button text to Next
-      //and show the answer in the timer label
       e.target.innerText = "Next";
+      //show the answer in the timer label
       timer.innerText = triviaQuestions[triviaIndex].answer;
     } else {
-    //change the button text to Answer
       e.target.innerText = "Answer";
       nextTrivia();
     }
   }
-  const playBtn   = document.getElementById("pause");
   playBtn.onclick = (e)=>{
     if (timerState === "paused") {
       e.target.innerText = "Pause";
@@ -168,40 +150,79 @@ async function play_trivia()
       timerState = "paused";
     }
   }
-  const prevBtn   = document.getElementById("prev");
   prevBtn.onclick = ()=>{
     triviaIndex -= 1;
     if (triviaIndex < 0) {
       triviaIndex = triviaQuestions.length-1;
     }
-    out.src = `/Movie-Tracker/bg/${triviaQuestions[triviaIndex].question}`;
+    question.src = `/Movie-Tracker/bg/${triviaQuestions[triviaIndex].question}`;
     resetTimer();
     multipleChoice();
     // clearRound();
     answerBtn.innerText = "Answer";
   }
-  const nextBtn   = document.getElementById("next");
   nextBtn.onclick = ()=>{
     nextTrivia();
     answerBtn.innerText = "Answer";
   }
-  const twitchName = document.getElementById("twitchName");
   twitchName.addEventListener("keypress", (e)=>{
+    //TODO: need a good way to prevent
+    //reconnecting to same chat over and over
     if (e.key === "Enter") {
-
       e.preventDefault();
       startChat(e.target.value, parseChatCallback);
     }
   });
+  connectBtn.onclick = (e)=>{
+    e.preventDefault();
+    if (e.target.innerText === "Connect") {
+      e.target.innerText = "Disconnect";
+      startChat(twitchName.value);
+    } else {
+      twitchChatDisconnect();
+      e.target.innerText = "Connect";
+    }
+  }
+}
 
-  endTime = performance.now() + 1000*countdownTime;
+//get the next trivia entry and fill
+//the question.src with new entry
+function nextTrivia() {
+  triviaIndex += 1;
+  if (triviaIndex >= triviaQuestions.length) {
+    timerState = "paused";
+    // clearRound();
+    document.getElementById("choiceDiv").innerHTML = "";
+    showScore();
+    return;
+  }
+  //change the trivia question.src to match new index
+  question.src = `/Movie-Tracker/bg/${triviaQuestions[triviaIndex].question}`;
+  //reset for next round
+  resetTimer();
   multipleChoice();
-  stateMachine();
+  // clearRound();
+}
+
+
+function restartTimer() {
+  const countdown = timer.innerText;
+  if (Number(countdown)) {
+    endTime = performance.now() + 1000*countdown;
+  }
+  timerState = "running";
+}
+function resetTimer() {
+  timer.innerText = countdownTime;
+  endTime = performance.now() + countdownTime*1000;
+  timerState = "running";
 }
 
 
 async function startChat(chatName, parseChat)
 {
+  //used the globalThis variable to share twitch_chat
+  //this bypasses module requirements for import
   globalThis.twitchChatConnect(chatName, parseChat);
 }
 
@@ -287,8 +308,6 @@ async function createQuestions()
     }
   });
 }
-
-
 
 function parseTriviaChat(name, outmsg)
 {
@@ -486,9 +505,7 @@ function multipleChoice() {
   function handleClick(e) {
     //if button has the correct answer...
     if (e.target.firstChild.data === triviaQuestions[triviaIndex].answer) {
-      //change "answer" button text to match next element
       //display correct answer in timer
-      const answerBtn = document.getElementById("answer");
       if (answerBtn.innerText !== "Next") {
         answerBtn.innerText = "Next";
         endTime = performance.now();
@@ -518,29 +535,25 @@ function clearRound()
 
 function showScore()
 {
-  const timer = document.getElementById("timer");
+  // const timer = document.getElementById("timer");
   timer.innerText = "";
   const title = document.getElementById("title");
   title.innerText = "Score";
-  const nextBtn = document.getElementById("next");
-  const prevBtn = document.getElementById("prev");
-  const pausBtn = document.getElementById("pause");
-  const answBtn = document.getElementById("answer");
+
   nextBtn.disabled = true;
   prevBtn.disabled = true;
-  pausBtn.disabled = true;
+  playBtn.disabled = true;
   setTimeout(()=>{
-    answBtn.innerText = "Restart?";
+    answerBtn.innerText = "Restart?";
   }, 10);
   // console.log("answer:", answBtn.innerText);
-  answBtn.onclick = ()=>{
+  answerBtn.onclick = ()=>{
     location.reload();
   }
 
-  const trivia = document.getElementById("trivia");
-  trivia.removeChild(document.getElementById("question"));
+  triviaDiv.removeChild(document.getElementById("question"));
   const scoreCard = document.createElement("table");
-  trivia.appendChild(scoreCard);
+  triviaDiv.appendChild(scoreCard);
   scoreCard.className = "scoreCard";
 
   const scoreArr = Object.entries(score);
