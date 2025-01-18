@@ -168,6 +168,8 @@ function initButtons()
   twitchName.addEventListener("keypress", (e)=>{
     //TODO: need a good way to prevent
     //reconnecting to same chat over and over
+    //when pressing enter
+    //TODO: also need to indicate connected somehow
     if (e.key === "Enter") {
       e.preventDefault();
       startChat(e.target.value, parseChatCallback);
