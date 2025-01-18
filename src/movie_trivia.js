@@ -295,14 +295,13 @@ function parseTriviaChat(name, outmsg)
   if (triviaIndex >= triviaQuestions.length) {
     return {won: false, str: ""};   //should show scoreboard
   }
+  if (winners[triviaIndex]) {
+    return {won: false, str: ""};   //round over, wait for next round
+  }
   if (answered.includes(name)) {
     return {won: false, str: " -- Oops, you already played this round."};   //already answered incorrectly
   }
-  console.log("w", winners[triviaIndex]);
-  if (winners[triviaIndex]) {
-    console.log('is this running?');
-    return {won: false, str: ""};   //already won the round?
-  }
+
   // console.log("outmsg: ", outmsg);
   // console.log("answer: ", correctAnsIdx);
   if (Number(outmsg) === correctAnsIdx) {
