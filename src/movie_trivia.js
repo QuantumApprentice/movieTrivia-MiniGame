@@ -7,14 +7,14 @@ import ("./twitch_chat.js").then((e)=>{
   // resetAnswered = e.resetAnswered;
 });
 
-let lastTime;
-function fpsCounter() {
-  let currentTime = new Date().getTime();
-  let counter = document.getElementById("fps");
-  counter.innerText = 1000/(currentTime-lastTime);
-  lastTime = currentTime;
-  requestAnimationFrame(animationCallback);
-}
+// let lastTime;
+// function fpsCounter() {
+//   let currentTime = new Date().getTime();
+//   let counter = document.getElementById("fps");
+//   counter.innerText = 1000/(currentTime-lastTime);
+//   lastTime = currentTime;
+//   requestAnimationFrame(animationCallback);
+// }
 
 // play_movie_trivia();
 
@@ -40,6 +40,11 @@ function fpsCounter() {
 // clocks can change, performance.now() 
 // is meant to be number of milliseconds 
 // since the page loaded
+
+let tmdbList;
+let answered = [];
+let winners  = [];
+const maxMsgCount = 5;
 
 let triviaIndex = 0;
 let score = {};
@@ -185,8 +190,7 @@ async function play_trivia()
     if (e.key === "Enter") {
 
       e.preventDefault();
-      startChat(e.target.value, parseTriviaChat);
-      // console.log('e', e.target.value);
+      startChat(e.target.value, parseChatCallback);
     }
   });
 
@@ -196,26 +200,73 @@ async function play_trivia()
 }
 
 
-function startChat(chatName, parseChat)
+async function startChat(chatName, parseChat)
 {
-  // console.log("g", globalThis.twitchChatConnect);
   globalThis.twitchChatConnect(chatName, parseChat);
 }
 
 
-let tmdbList;
+function parseChatCallback(name, outmsg, auth, chatMSG)
+{
+  const winner = parseTriviaChat(name, outmsg);
+
+  //option to hide chat except for
+  //those who guess correctly
+  const chatBody = document.getElementById("twitchChat");
+  let hideChat = false;
+  if (hideChat) {
+    if (winner.won) {
+      let msg = document.createElement("div");
+      msg.classList.add("msg");
+      msg.innerHTML = outmsg;
+
+      msg.classList.add("winner");
+      auth.classList.add("winner");
+
+      chatMSG.append(auth, msg);
+      // chat message has to be prepended to appear on bottom
+      chatBody.prepend(chatMSG);
+    }
+  } else {
+    let msg = document.createElement("div");
+    msg.classList.add("msg");
+    msg.innerHTML = outmsg;
+
+    if (winner.won) {
+      msg.classList.add("winner");
+      auth.classList.add("winner");
+    }
+    msg.innerText += winner.str;
+
+    chatMSG.append(auth, msg);
+    // chat message has to be prepended to appear on bottom
+    const chatBody = document.getElementById("twitchChat");
+    chatBody.prepend(chatMSG);
+  }
+  chatMSG.classList.add("message_box");
+
+  // if more than maxMsgCount, delete first message
+  if (chatBody.children.length > maxMsgCount) {
+    chatBody.lastElementChild.remove();
+  }
+
+}
+play_trivia();
+
+async function loadTMDB()
+{
+  // const res = await fetch("/Movie-Tracker/src/tmdbList.json");
+  const res = await fetch(`https://raw.githubusercontent.com/QuantumApprentice/Movie-Tracker/refs/heads/master/src/tmdbList.json`);
+  if (!res.ok) {
+    throw new Error(`Response failed? ${res.status}`);
+  }
+  return res.json();
+}
+
+
 async function createQuestions()
 {
-  try {
-    // const res = await fetch("/Movie-Tracker/src/tmdbList.json");
-    const res = await fetch(`https://raw.githubusercontent.com/QuantumApprentice/Movie-Tracker/refs/heads/master/src/tmdbList.json`);
-    if (!res.ok) {
-      throw new Error(`Response failed? ${res.status}`);
-    }
-    tmdbList = await res.json();
-  } catch (err) {
-    console.error(err.message);
-  }
+  tmdbList = await loadTMDB();
 
   let indexArr = new Array(10);
   for (let i = 0; i < 10; i++) {
@@ -229,7 +280,6 @@ async function createQuestions()
     indexArr[i] = currIndex;
   }
 
-
   triviaQuestions = indexArr.map((e)=>{
     return {
       answer: tmdbList[e].title,
@@ -237,12 +287,9 @@ async function createQuestions()
     }
   });
 }
-play_trivia();
 
 
 
-let answered = [];
-let winners  = [];
 function parseTriviaChat(name, outmsg)
 {
   if (triviaIndex >= triviaQuestions.length) {
@@ -251,7 +298,9 @@ function parseTriviaChat(name, outmsg)
   if (answered.includes(name)) {
     return {won: false, str: " -- Oops, you already played this round."};   //already answered incorrectly
   }
+  console.log("w", winners[triviaIndex]);
   if (winners[triviaIndex]) {
+    console.log('is this running?');
     return {won: false, str: ""};   //already won the round?
   }
   // console.log("outmsg: ", outmsg);

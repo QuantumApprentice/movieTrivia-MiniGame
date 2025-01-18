@@ -2,7 +2,6 @@
 globalThis.twitchChatConnect = twitchChatConnect;
 
 const TwitchWebSocketUrl = 'wss://irc-ws.chat.twitch.tv:443';
-const maxMsgCount        = 5;
 const chatBody = (document.querySelector("#ChatMessages"));
 let wsTwitch;
 let channelName;
@@ -81,14 +80,12 @@ function onMessage(fullmsg)
     return;
   }
 
+  // return display_msg(name, outmsg);
   display_msg(name, outmsg);
   // console.log("name", name);
   // console.log("outmsg", outmsg);
 
 }
-
-
-
 
 // display chat message on stream
 function display_msg(name, outmsg, tags_obj, emote_list)
@@ -130,52 +127,5 @@ function display_msg(name, outmsg, tags_obj, emote_list)
     outmsg = parts.join('');
   }
 
-
-
-
-
-
-
-  const winner = parseChat(name, outmsg);
-
-  //option to hide chat except for
-  //those who guess correctly
-  const chatBody = document.getElementById("twitchChat");
-  let hideChat = false;
-  if (hideChat) {
-    if (winner.won) {
-      let msg = document.createElement("div");
-      msg.classList.add("msg");
-      msg.innerHTML = outmsg;
-
-      msg.classList.add("winner");
-      auth.classList.add("winner");
-
-      chatMSG.append(auth, msg);
-      // chat message has to be prepended to appear on bottom
-      chatBody.prepend(chatMSG);
-    }
-  } else {
-    let msg = document.createElement("div");
-    msg.classList.add("msg");
-    msg.innerHTML = outmsg;
-
-    if (winner.won) {
-      msg.classList.add("winner");
-      auth.classList.add("winner");
-    }
-    msg.innerText += winner.str;
-
-    chatMSG.append(auth, msg);
-    // chat message has to be prepended to appear on bottom
-    const chatBody = document.getElementById("twitchChat");
-    chatBody.prepend(chatMSG);
-  }
-  chatMSG.classList.add("message_box");
-
-  // if more than maxMsgCount, delete first message
-  if (chatBody.children.length > maxMsgCount) {
-    chatBody.lastElementChild.remove();
-  }
-
+  parseChat(name, outmsg, auth, chatMSG);
 }
