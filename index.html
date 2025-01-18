@@ -77,11 +77,14 @@
       background-color: rgb(85, 0, 0);
     }
 
-
+    .twitchName {
+      font-size: 28px;
+      width: 200px;
+      color: aqua;
+    }
     .name {
       font-size: 28px;
       color: aqua;
-
     }
     .msg {
       font-size: 24px;
@@ -137,13 +140,12 @@
   <title>Document</title>
 </head>
 <body id="root">
-  <div id="title" class="triviaTitle">Name That Movie!</div>
+  <div id="title" class="triviaTitle">Name That Movie!
+    <input id="twitchName" class="twitchName"></input>
+  </div>
   <div id="triviaChat" class="triviaChat">
     <div id="trivia" class="trivia" data-idx="0" ></div>
-    <div id="twitchChat" class="twitchChat">
-      <label id="twitchName" class="name"></label>
-      <label id="chatMsg" class="msg"></label>
-    </div>
+    <div id="twitchChat" class="twitchChat"></div>
   </div>
 
   <div id="buttons">
@@ -157,7 +159,11 @@
     <lable id="fps"></lable>
   </div>
   <div id="choiceDiv" class="choiceDiv"></div>
-  <script src="src/movie_trivia.js"></script>
+
+
+
+  <script src="src/twitch_chat.js" type="module"></script>
+  <script src="src/movie_trivia.js" type="module"></script>
 
 </body>
 </html>

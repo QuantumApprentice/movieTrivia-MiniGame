@@ -1,12 +1,12 @@
 "use strict";
-// import {parseTriviaChat} from './twitch_chat.js'
-// const parseTriviaChat = require('./twitch_chat')
-// import text from './assets/movie_bgs.json'
-// const fs = require('node:fs');
 
-//got this from stackoverflow
-//https://stackoverflow.com/questions/32509885/scan-folder-content-in-javascript
-//doesn't work, but not sure why
+// import {twitchChatConnect} from "./twitch_chat.js";
+let twitchChatConnect;
+let resetAnswered;
+import ("./twitch_chat.js").then((e)=>{
+  twitchChatConnect = e.twitchChatConnect;
+  resetAnswered = e.resetAnswered;
+});
 
 let lastTime;
 function fpsCounter() {
@@ -42,32 +42,6 @@ function fpsCounter() {
 // is meant to be number of milliseconds 
 // since the page loaded
 
-// let triviaQuestions = [
-//   {answer:"Frankenstein",
-//     question:"https://quantumapprentice.github.io/Movie-Tracker/bg/frankenstein-1931.jpg"},
-//   {answer:"Die Hard",
-//     question:"die-hard-for-sure-sure.gif"},
-//   {answer:"Jurassic Park",
-//     question:"jurassic-park-samuel-l-jackson.gif"},
-//   {answer:"Kung Pow",
-//     question:"kung-pow-thats-a-lot-of-nuts.gif"},
-//   {answer:"Junior",
-//     question:"junior-arnold-schwarzenegger.gif"},
-//   {answer:"It's a Wonderful Life",
-//     question:"its-a-wonderful-life-how-do-you-do-james-stewart.gif"},
-//   {answer:"Jingle All the Way",
-//     question:"jingle-all-the-way.gif"},
-//   {answer:"Planes, Trains and Automobiles",
-//     question:"planes-trains-and-automobiles-john-candy-devil.gif"},
-//   {answer:"Rudolph the Red Nosed Reindeer", 
-//     question:"rudolph-the-red-nosed-reindeer-hermie-dentist.gif"},
-//   {answer:"Scrooged",
-//     question:"scrooged-toaster.gif"},
-//   {answer:"Spaceballs",
-//     question:"spaceballs-alien-kane.gif"},
-//   {answer:"Trading Places",
-//     question:"trading-places-dan-aykroyd.gif"},
-// ];
 let triviaIndex = 0;
 let score = {};
 let endTime;
@@ -207,18 +181,35 @@ async function play_trivia()
     nextTrivia();
     answerBtn.innerText = "Answer";
   }
+  const twitchName = document.getElementById("twitchName");
+  twitchName.addEventListener("keypress", (e)=>{
+    if (e.key === "Enter") {
+
+      e.preventDefault();
+      startChat(e.target.value);
+      // console.log('e', e.target.value);
+    }
+  });
 
   endTime = performance.now() + 1000*countdownTime;
   multipleChoice();
   stateMachine();
 }
 
+
+function startChat(chatName)
+{
+  // console.log("g", globalThis.twitchChatConnect);
+  globalThis.twitchChatConnect(chatName);
+}
+
+
 let tmdbList;
 async function createQuestions()
 {
   try {
     // const res = await fetch("/Movie-Tracker/src/tmdbList.json");
-    const res = await fetch(`https://raw.githubusercontent.com/QuantumApprentice/Movie-Tracker/refs/heads/master/src/tmdbList.json`)
+    const res = await fetch(`https://raw.githubusercontent.com/QuantumApprentice/Movie-Tracker/refs/heads/master/src/tmdbList.json`);
     if (!res.ok) {
       throw new Error(`Response failed? ${res.status}`);
     }
@@ -246,14 +237,12 @@ async function createQuestions()
       question: tmdbList[e].bg
     }
   });
-
-  // console.log("temp", triviaQuestions);
 }
+play_trivia();
 
 function createAnswers()
 {
-  answered = [];  //reset so same people can answer again
-
+  resetAnswered();
   /////////////////////////////////////////////
   //QuantumApprentice
   // let answers = new Set();
@@ -436,7 +425,6 @@ function clearRound()
   chat.innerText = "";
 }
 
-play_trivia();
 
 
 
@@ -494,207 +482,5 @@ function showScore()
   });
 }
 
+// #region this is cool
 
-
-
-//connect to twitch chat
-const channelName        = 'quantumapprentice';
-const TwitchWebSocketUrl = 'wss://irc-ws.chat.twitch.tv:443';
-const maxMsgCount        = 5;
-const chatBody = (document.querySelector("#ChatMessages"));
-const wsTwitch = new WebSocket(TwitchWebSocketUrl);
-wsTwitch.onopen = ()=>{
-    console.log("chat opened");
-  wsTwitch.send(`CAP REQ :twitch.tv/commands twitch.tv/tags`);
-  wsTwitch.send(`NICK justinfan6969`);
-  wsTwitch.send(`JOIN #${channelName}`);
-  console.log('WebSocket connection opened');    //debug
-}
-
-wsTwitch.onmessage = (fullmsg) => {
-  // console.log("fullmsg: ", fullmsg);
-  let txt = fullmsg.data;
-  // console.log("txt: ", txt);
-  let name = '';
-  let outmsg = '';
-  let indx = 0;
-  // let just_tags = '';
-  // let tags_obj = {};
-  // const emote_list = [];
-
-  if (txt[0] == '@') {
-    indx = txt.indexOf(' ');
-    // just_tags = txt.slice(0, indx);
-    indx++;
-    // tags_obj = parse_tags(just_tags);
-    // get_emote_list(tags_obj['emotes'], emote_list);
-  }
-
-  if (txt[indx] == ':') {
-    // get the important data positions
-    let pos1 = txt.indexOf('@', indx) + 1;
-    let pos2 = txt.indexOf(".", pos1);
-    let pos3 = txt.indexOf(`#${channelName}`)+2;
-    pos3 += channelName.length + 1;
-
-    // create strings based on those positions
-    name = txt.substring(pos1, pos2).trim();
-
-    if ((name == ":tmi")
-      || (name == "justinfan6969")
-      || (name.includes("@emote-only=0;"))
-      || (name == ":justinfan6969"))
-      { return; }
-
-    outmsg = txt.substring(pos3).trim();
-  }
-  else {
-    // handle pings
-    // other twitch specific things should
-    // be handled here too
-    let pos2 = txt.indexOf(":");
-    name = txt.slice(0, pos2).trim();
-    outmsg = txt.slice(pos2).trim();
-
-    if (name == 'PING') {
-      // console.log('PONG ' + outmsg);
-      wsTwitch.send('PONG ' + outmsg);
-    }
-    return;
-  }
-
-  //not running bot commands here
-  if (outmsg[0] == '!') {
-    return;
-  }
-
-  display_msg(name, outmsg);
-  // console.log("name", name);
-  // console.log("outmsg", outmsg);
-
-}
-
-let answered = [];
-let winners  = [];
-function parseTriviaChat(name, outmsg)
-{
-  if (triviaIndex >= triviaQuestions.length) {
-    return {won: false, str: ""};   //should show scoreboard
-  }
-  if (answered.includes(name)) {
-    return {won: false, str: " -- Oops, you already played this round."};   //already answered incorrectly
-  }
-  if (winners[triviaIndex]) {
-    return {won: false, str: ""};   //already won the round?
-  }
-  // console.log("outmsg: ", outmsg);
-  // console.log("answer: ", correctAnsIdx);
-  if (Number(outmsg) === correctAnsIdx) {
-    winners.push(name);
-    endTime = performance.now();
-    score[name] = score[name] ? (score[name]+=1) : 1;
-    return {won: true, str: ""};    //winner through multiple choice
-  }
-  if (outmsg.toLowerCase().indexOf(triviaQuestions[triviaIndex].answer) != -1) {
-    winners.push(name);
-    endTime = performance.now();
-    score[name] = score[name] ? (score[name]+=1) : 1;
-    return {won: true, str: " -- Oh wow, you actually typed it out?"};    //won by typing name?
-  }
-  if (!isNaN(outmsg) && (Number(outmsg) > 0 && Number(outmsg) < 5)) {
-    answered.push(name);
-    return {won: false, str: " -- Sorry, you didn't win this time."};
-  }
-  return {won: false, str: ""};   //all regular chat
-}
-
-
-// display chat message on stream
-function display_msg(name, outmsg, tags_obj, emote_list)
-{
-  let emote;
-  let chatMSG = document.createElement("div");
-
-  if (outmsg.startsWith('\x01ACTION')) {
-    outmsg = outmsg.substring(7, outmsg.length - 1).trim();
-    chatMSG.classList.add('msg_is_emote');
-  }
-
-  let auth = document.createElement("div");
-  auth.classList.add("name");
-
-  if (tags_obj?.color) {
-    chatMSG.style.setProperty('--name-color', tags_obj['color']);
-  }
-
-  auth.textContent = (tags_obj?.display_name || name) + ' ';
-
-  if (tags_obj?.emotes) {
-      let parts = [];
-      let end_indx = outmsg.length;
-
-    for (let i = emote_list.length; --i >= 0; ) {
-      emote = document.createElement("img");
-      emote.setAttribute('src', emote_list[i].url);
-      if (i!==0) {
-        emote.style = 'margin-left: -14px';
-      }
-
-      let last_half = esc_html(outmsg.slice(emote_list[i].end + 1, end_indx));
-      parts.unshift(last_half);
-      parts.unshift(emote.outerHTML);
-      end_indx = emote_list[i].start;
-    }
-    parts.unshift(esc_html(outmsg.slice(0, end_indx)));
-    outmsg = parts.join('');
-  }
-
-
-
-
-
-
-
-  const winner = parseTriviaChat(name, outmsg);
-
-  //option to hide chat except for
-  //those who guess correctly
-  const chatBody = document.getElementById("twitchChat");
-  let hideChat = false;
-  if (hideChat) {
-    if (winner.won) {
-      let msg = document.createElement("div");
-      msg.classList.add("msg");
-      msg.innerHTML = outmsg;
-
-      msg.classList.add("winner");
-      auth.classList.add("winner");
-
-      chatMSG.append(auth, msg);
-      // chat message has to be prepended to appear on bottom
-      chatBody.prepend(chatMSG);
-    }
-  } else {
-    let msg = document.createElement("div");
-    msg.classList.add("msg");
-    msg.innerHTML = outmsg;
-
-    if (winner.won) {
-      msg.classList.add("winner");
-      auth.classList.add("winner");
-    }
-    msg.innerText += winner.str;
-
-    chatMSG.append(auth, msg);
-    // chat message has to be prepended to appear on bottom
-    const chatBody = document.getElementById("twitchChat");
-    chatBody.prepend(chatMSG);
-  }
-  chatMSG.classList.add("message_box");
-
-  // if more than maxMsgCount, delete first message
-  if (chatBody.children.length > maxMsgCount) {
-    chatBody.lastElementChild.remove();
-  }
-
-}
