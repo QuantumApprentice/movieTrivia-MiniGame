@@ -1,10 +1,11 @@
 "use strict";
 
 let twitchChatConnect;
-let twitchChatDisconnect;
 import ("./twitch_chat.js").then((e)=>{
+  //this way only works with modules enabled
+  //(see script assignments in index.html)
+  //(L270 at time of writing this comment)
   twitchChatConnect    = e.twitchChatConnect;
-  twitchChatDisconnect = e.twitchChatDisconnect;
 });
 
 // let lastTime;
@@ -53,9 +54,11 @@ const question   = document.createElement("img");
 
 
 
-const maxMsgCount = 5;
-const countdownTime = 30;
-const answerTime = 15;
+let maxMsgCount   = 5;
+let countdownTime = 30;
+let answerTime    = 15;
+let questionCount = 10;
+let twitchChatWS;
 
 let tmdbList;
 let answered = [];
@@ -69,14 +72,12 @@ let timerState = "running";
 let triviaQuestions;
 async function play_trivia()
 {
-
   let prevState;
 
   // triviaQuestions = await createQuestions();
   await createQuestions();
   initButtons();
   endTime = performance.now() + 1000*countdownTime;
-
 
   // question.src = `assets/${triviaQuestions[0].question}`;
   question.src = `/Movie-Tracker/bg/${triviaQuestions[0].question}`;
@@ -96,7 +97,6 @@ async function play_trivia()
 
   function updateTimer() {
     playBtn.innerText = "Pause";
-    // const answerBtn = document.getElementById("answer");
     if (answerBtn.innerText !== "Next") {
       const now = performance.now();
       timer.innerText = Math.floor((endTime - now)%(1000*60)/1000);
@@ -166,24 +166,68 @@ function initButtons()
     answerBtn.innerText = "Answer";
   }
   twitchName.addEventListener("keypress", (e)=>{
-    //TODO: need a good way to prevent
-    //reconnecting to same chat over and over
-    //when pressing enter
-    //TODO: also need to indicate connected somehow
     if (e.key === "Enter") {
-      e.preventDefault();
+      e.stopPropagation();
+      // console.log("val",e.target.value);
+      if (connectBtn.innerText === "Connect to Twitch Chat") {
+        connectBtn.innerText = "Disconnect";
+      }
       startChat(e.target.value, parseChatCallback);
     }
   });
   connectBtn.onclick = (e)=>{
-    e.preventDefault();
-    if (e.target.innerText === "Connect") {
+    e.stopPropagation();
+    if (e.target.innerText === "Connect to Twitch Chat") {
       e.target.innerText = "Disconnect";
-      startChat(twitchName.value);
+      startChat(twitchName.value, parseChatCallback);
     } else {
-      twitchChatDisconnect();
-      e.target.innerText = "Connect";
+      twitchChatWS.close();
+      e.target.innerText = "Connect to Twitch Chat";
+
+      twitchChatWS.onclose = ()=>{
+        let chatMSG = document.createElement("div");
+        let auth = document.createElement("div");
+        parseChatCallback("TriviaBot",
+          `Disconnected from twitch chat.`,
+          auth, chatMSG);
+      }
+
     }
+  }
+  const hamburger = document.getElementById("hamburger");
+  hamburger.onclick = (e)=>{
+    e.stopPropagation();
+    e.currentTarget.classList.toggle("change");
+    document.getElementById("sidebar").classList.toggle("change");
+  }
+  const triviaCount = document.getElementById("triviaCount");
+  if (triviaCount.value != questionCount) {
+    questionCount = triviaCount.value;
+    createQuestions();
+  }
+  triviaCount.onchange = (e)=>{
+    questionCount = e.target.value;
+    createQuestions();
+  }
+
+  const triviaTime = document.getElementById("triviaTime");
+  if (triviaTime.value != countdownTime) {
+    countdownTime = triviaTime.value;
+  }
+  triviaTime.onchange = (e)=>{
+    countdownTime = e.target.value;
+    const countdown = timer.innerText;
+    if (countdownTime < Number(countdown)) {
+      restartTimer();
+    }
+  }
+
+  const pauseTime = document.getElementById("pauseTime");
+  if (pauseTime.value != answerTime) {
+    answerTime = pauseTime.value;
+  }
+  pauseTime.onchange = (e)=>{
+    answerTime = e.target.value;
   }
 }
 
@@ -194,7 +238,6 @@ function nextTrivia() {
   if (triviaIndex >= triviaQuestions.length) {
     timerState = "paused";
     // clearRound();
-    document.getElementById("choiceDiv").innerHTML = "";
     showScore();
     return;
   }
@@ -220,12 +263,31 @@ function resetTimer() {
   timerState = "running";
 }
 
-
-async function startChat(chatName, parseChat)
+async function startChat(chatName, chatParser)
 {
+  let chatMSG = document.createElement("div");
+  let auth = document.createElement("div");
+  // console.log("running");
+  if (!twitchChatWS) {
+  } else {
+    if (twitchChatWS.readyState === twitchChatWS.OPEN) {
+      twitchChatWS.close();
+      parseChatCallback("TriviaBot",
+                        `Disconnecting from ${chatName} and...`,
+                        auth, chatMSG);
+    }
+  }
   //used the globalThis variable to share twitch_chat
   //this bypasses module requirements for import
-  globalThis.twitchChatConnect(chatName, parseChat);
+  twitchChatWS = await globalThis.twitchChatConnect(chatName, chatParser);
+
+  // console.log("twitchChatWS?",twitchChatWS);
+  twitchChatWS.onopen = ()=>{
+    parseChatCallback("TriviaBot",
+      `Connected to ${chatName}'s chat!`,
+      auth, chatMSG);
+  }
+
 }
 
 
@@ -279,11 +341,18 @@ play_trivia();
 async function loadTMDB()
 {
   // const res = await fetch("/Movie-Tracker/src/tmdbList.json");
-  const res = await fetch(`https://raw.githubusercontent.com/QuantumApprentice/Movie-Tracker/refs/heads/master/src/tmdbList.json`);
-  if (!res.ok) {
-    throw new Error(`Response failed? ${res.status}`);
-  }
-  return res.json();
+  // const res = await fetch(`https://raw.githubusercontent.com/QuantumApprentice/Movie-Tracker/refs/heads/master/src/tmdbList.json`);
+  // if (!res.ok) {
+  //   throw new Error(`Response failed? ${res.status}`);
+  // }
+  // return res.json();
+  return fetch(`https://raw.githubusercontent.com/QuantumApprentice/Movie-Tracker/refs/heads/master/src/tmdbList.json`)
+    .then((r)=>{
+      if (!r.ok) {
+        throw new Error(`Response failed? ${r.status}`);
+      }
+      return r.json()
+    });
 }
 
 
@@ -291,8 +360,8 @@ async function createQuestions()
 {
   tmdbList = await loadTMDB();
 
-  let indexArr = new Array(10);
-  for (let i = 0; i < 10; i++) {
+  let indexArr = new Array(questionCount);
+  for (let i = 0; i < questionCount; i++) {
     let currIndex;
     do {
       currIndex = Math.floor(Math.random() * tmdbList.length);

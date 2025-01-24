@@ -2,7 +2,7 @@
 globalThis.twitchChatConnect = twitchChatConnect;
 
 const TwitchWebSocketUrl = 'wss://irc-ws.chat.twitch.tv:443';
-const chatBody = (document.querySelector("#ChatMessages"));
+// const chatBody = (document.querySelector("#ChatMessages"));
 let wsTwitch;
 let channelName;
 let parseChatCallback;
@@ -19,6 +19,8 @@ export function twitchChatConnect(name, chatParseCallback)
     console.log('WebSocket connection opened');    //debug
   }
   wsTwitch.onmessage = onMessage;
+
+  return wsTwitch;
 }
 
 export function twitchChatDisconnect()

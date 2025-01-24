@@ -43,6 +43,7 @@
       text-align: center;
       color: aliceblue;
       white-space: nowrap;
+
     }
     .scoreCard {
       width: 500px;
@@ -106,7 +107,7 @@
     }
 
     .choiceBtn {
-      width: 500px;
+      width: 700px;
       height: 80px;
       display: flex;
       flex-direction: row;
@@ -123,46 +124,164 @@
       align-content: center;
     }
     .choice {
-      width: 500px;
+      width: 700px;
       background-color: inherit;
       font-size: 32px;
       color: aqua;
-      /* align-content:space-around */
       display: flex;
       justify-content: center;
       align-items: center;
     }
+
+    .titleConnect {
+      display: flex;
+    }
     .connectBtn {
       width: fit-content;
+      width: 200px;
+      height: 65px;
+      font-size: 24px;
+      font-weight: bold;
+      line-height: 100%;
+      z-index: 1;
+    }
+    .gameboard {
+      margin-left: 80px;
+    }
+
+
+    .hamburger {
+      position: fixed;
+      margin-top: 5px;
+      border: solid red;
+      pointer-events: auto;
+      width: 65px;
+      height: 60px;
+    }
+    .hamburger > * { /*hamburger slices*/
+      width: 35px;
+      height: 7px;
+      background-color: gray;
+      margin: 7px;
+      transition: .5s;
+    }
+    .hamburger.change > :nth-child(1) {
+      transform: translate(0, 14px) rotate(-45deg);
+      margin-top: 0px;
+    }
+    .hamburger.change > :nth-child(2) {
+      opacity: 0;
+    }
+    .hamburger.change > :nth-child(3) {
+      transform: translate(0,-14px) rotate(45deg);
+      margin-bottom: 0px;
+    }
+
+    .sidebar {
+      background-color: rgba(0, 0, 0, 0.25);
+      color: aqua;
+      position: fixed;
+      z-index: 1;
+      overflow-x: hidden;
+      width: 0;
+    }
+    .sidebar.change {
+      width: 240px;
+    }
+    .sidebar > div > input {
+      color: aqua;
+      font-size: 24px;
+      font-weight: bold;
+      width: 60px;
+    }
+    .sidebar > div > label {
+      color: aqua;
+      font-size: 24px;
+      font-weight: bold;
+      position: relative;
+    }
+
+    .tooltip {
+      font-size: 20px;
+    }
+    .tooltip .tooltiptext {
+      width: 120px;
+      background-color: #555;
+      position: absolute;
+      margin-left: 90px;
+      color: #fff;
+      z-index: 1;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .tooltip:hover .tooltiptext {
+      opacity: 1;
     }
 
 
   </style>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>Movie Trivia</title>
 </head>
 <body id="root">
-  <div id="title" class="triviaTitle">Name That Movie!
-    <input id="twitchName" class="twitchName"></input>
-    <button id="connectChatBtn" class="connectBtn">Connect</button>
-  </div>
-  <div id="triviaChat" class="triviaChat">
-    <div id="trivia" class="trivia" data-idx="0" ></div>
-    <div id="twitchChat" class="twitchChat"></div>
+  <div class="sidebar" id="sidebar">
+    <button class="hamburger" id="hamburger">
+      <div></div>
+      <div></div>
+      <div></div>
+    </button>
+    <div class="tooltip" style="margin-top: 55px;">
+      <span class="tooltiptext">Number of Trivia Questions</span>
+      <input id="triviaCount"
+        placeholder="10"
+        value="10"
+        type="number">
+      </input>
+      <label>Questions</label>
+    </div>
+    <div class="tooltip">
+      <span class="tooltiptext">Time per Trivia Question</span>
+      <input id="triviaTime"
+        placeholder="30"
+        value="30"
+        type="number"></input>
+      <label>s per Trivia</label>
+    </div>
+    <div class="tooltip">
+      <span class="tooltiptext">Delay before starting next Trivia Question</span>
+      <input id="pauseTime"
+        placeholder="10"
+        value="10"
+        type="number"></input>
+      <label>s per Answer</label>
+    </div>
+    <input id="twitchName" class="twitchName" placeholder="twitch chat"></input>
   </div>
 
-  <div id="buttons">
-    <button id="prev">&lt;&lt;</button>
-    <button id="pause">Pause</button>
-    <button id="answer">Answer</button>
-    <button id="next">&gt;&gt;</button>
+  <div class="gameboard">
+    <div class="titleConnect">
+      <div id="title" class="triviaTitle">Name That Movie!</div>
+      <button id="connectChatBtn" class="connectBtn">Connect to Twitch Chat</button>
+    </div>
+  
+    <div id="triviaChat" class="triviaChat">
+      <div id="trivia" class="trivia" data-idx="0"></div>
+      <div id="twitchChat" class="twitchChat"></div>
+    </div>
+  
+    <div id="buttons">
+      <button id="prev"  >&lt;&lt;</button>
+      <button id="pause" >Pause</button>
+      <button id="answer">Answer</button>
+      <button id="next"  >&gt;&gt;</button>
+    </div>
+    <div>
+      <label id="timer" class="timer"></label>
+      <label id="fps"></label>
+    </div>
+    <div id="choiceDiv" class="choiceDiv"></div>
   </div>
-  <div>
-    <label id="timer" class="timer"></label>
-    <lable id="fps"></lable>
-  </div>
-  <div id="choiceDiv" class="choiceDiv"></div>
 
 
 
