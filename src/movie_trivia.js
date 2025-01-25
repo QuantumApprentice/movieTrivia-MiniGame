@@ -130,6 +130,7 @@ async function play_trivia()
 
 function initButtons()
 {
+  //answer/next
   answerBtn.onclick = (e)=>{
     if (e.target.innerText === "Answer") {
       e.target.innerText = "Next";
@@ -140,6 +141,7 @@ function initButtons()
       nextTrivia();
     }
   }
+  //play/pause
   playBtn.onclick = (e)=>{
     if (timerState === "paused") {
       e.target.innerText = "Pause";
@@ -150,6 +152,7 @@ function initButtons()
       timerState = "paused";
     }
   }
+  //next >>
   prevBtn.onclick = ()=>{
     triviaIndex -= 1;
     if (triviaIndex < 0) {
@@ -161,10 +164,14 @@ function initButtons()
     // clearRound();
     answerBtn.innerText = "Answer";
   }
+  //previous <<
   nextBtn.onclick = ()=>{
     nextTrivia();
     answerBtn.innerText = "Answer";
   }
+
+  //twitch chat connection stuff
+  //specifically attached to the connect button
   twitchName.addEventListener("keypress", (e)=>{
     if (e.key === "Enter") {
       e.stopPropagation();
@@ -177,29 +184,44 @@ function initButtons()
   });
   connectBtn.onclick = (e)=>{
     e.stopPropagation();
+
+    if (!twitchName.value) {
+      let chatMSG = document.createElement("div");
+      let auth = document.createElement("div");
+      parseChatCallback("TriviaBot",
+                        `No channel-name provided.`,
+                        auth, chatMSG);
+      return;
+    }
+
+
     if (e.target.innerText === "Connect to Twitch Chat") {
       e.target.innerText = "Disconnect";
       startChat(twitchName.value, parseChatCallback);
     } else {
-      twitchChatWS.close();
-      e.target.innerText = "Connect to Twitch Chat";
-
       twitchChatWS.onclose = ()=>{
+        e.target.innerText = "Connect to Twitch Chat";
+
         let chatMSG = document.createElement("div");
         let auth = document.createElement("div");
         parseChatCallback("TriviaBot",
           `Disconnected from twitch chat.`,
           auth, chatMSG);
       }
+      twitchChatWS.close();
 
     }
   }
+
+  //sidebar hamburger button
   const hamburger = document.getElementById("hamburger");
   hamburger.onclick = (e)=>{
     e.stopPropagation();
     e.currentTarget.classList.toggle("change");
     document.getElementById("sidebar").classList.toggle("change");
   }
+
+  //number of trivia elements in this run
   const triviaCount = document.getElementById("triviaCount");
   if (triviaCount.value != questionCount) {
     questionCount = triviaCount.value;
@@ -210,6 +232,7 @@ function initButtons()
     createQuestions();
   }
 
+  //amount of time trivia question will stay on screen
   const triviaTime = document.getElementById("triviaTime");
   if (triviaTime.value != countdownTime) {
     countdownTime = triviaTime.value;
@@ -222,6 +245,8 @@ function initButtons()
     }
   }
 
+  //amount of time the answer stays on screen
+  //before starting the next trivia question
   const pauseTime = document.getElementById("pauseTime");
   if (pauseTime.value != answerTime) {
     answerTime = pauseTime.value;
@@ -267,7 +292,6 @@ async function startChat(chatName, chatParser)
 {
   let chatMSG = document.createElement("div");
   let auth = document.createElement("div");
-  // console.log("running");
   if (!twitchChatWS) {
   } else {
     if (twitchChatWS.readyState === twitchChatWS.OPEN) {
@@ -282,11 +306,7 @@ async function startChat(chatName, chatParser)
   twitchChatWS = await globalThis.twitchChatConnect(chatName, chatParser);
 
   // console.log("twitchChatWS?",twitchChatWS);
-  twitchChatWS.onopen = ()=>{
-    parseChatCallback("TriviaBot",
-      `Connected to ${chatName}'s chat!`,
-      auth, chatMSG);
-  }
+
 
 }
 
@@ -294,6 +314,18 @@ async function startChat(chatName, chatParser)
 function parseChatCallback(name, outmsg, auth, chatMSG)
 {
   const winner = parseTriviaChat(name, outmsg);
+
+  //for some reason the twitch chat api sends a message
+  //back when the chat fails to connect (doesn't find channel)
+  //but does nothing when chat connection succeeds
+  if (outmsg === "This channel does not exist or has been suspended.") {
+    connectBtn.innerText = "Connect to Twitch Chat";
+    // console.log("a",auth);
+    // console.log("n",name);
+    // auth.innerText = name;
+  }
+
+  // console.log('chatting?');
 
   //option to hide chat except for
   //those who guess correctly
@@ -325,7 +357,7 @@ function parseChatCallback(name, outmsg, auth, chatMSG)
 
     chatMSG.append(auth, msg);
     // chat message has to be prepended to appear on bottom
-    const chatBody = document.getElementById("twitchChat");
+    // const chatBody = document.getElementById("twitchChat");
     chatBody.prepend(chatMSG);
   }
   chatMSG.classList.add("message_box");
@@ -334,6 +366,8 @@ function parseChatCallback(name, outmsg, auth, chatMSG)
   if (chatBody.children.length > maxMsgCount) {
     chatBody.lastElementChild.remove();
   }
+
+
 
 }
 play_trivia();

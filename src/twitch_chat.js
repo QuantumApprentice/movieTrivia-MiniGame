@@ -17,17 +17,18 @@ export function twitchChatConnect(name, chatParseCallback)
     wsTwitch.send(`NICK justinfan6969`);
     wsTwitch.send(`JOIN #${channelName}`);
     console.log('WebSocket connection opened');    //debug
+
+    let chatMSG = document.createElement("div");
+    let auth = document.createElement("div");
+    parseChatCallback("",
+      `Connected to ${channelName}'s chat!`,
+      auth, chatMSG
+    );
   }
   wsTwitch.onmessage = onMessage;
 
   return wsTwitch;
 }
-
-export function twitchChatDisconnect()
-{
-  wsTwitch.close();
-}
-
 
 function onMessage(fullmsg)
 {
@@ -59,7 +60,7 @@ function onMessage(fullmsg)
     // create strings based on those positions
     name = txt.substring(pos1, pos2).trim();
 
-    if ((name == ":tmi")
+    if ( (name == ":tmi")
       || (name == "justinfan6969")
       || (name.includes("@emote-only=0;"))
       || (name == ":justinfan6969"))
@@ -95,6 +96,8 @@ function onMessage(fullmsg)
 }
 
 // display chat message on stream
+// calls parseChatCallback() with elements created here
+//auth & chatMSG are both stylized here
 function display_msg(name, outmsg, tags_obj, emote_list)
 {
   let emote;
