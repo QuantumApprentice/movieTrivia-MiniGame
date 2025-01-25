@@ -50,7 +50,7 @@ const twitchName = document.getElementById("twitchName");
 const triviaDiv  = document.getElementById("trivia");
 const connectBtn = document.getElementById("connectChatBtn");
 const timer      = document.getElementById("timer");
-const question   = document.createElement("img");
+let   question   = document.createElement("img");
 
 
 
@@ -274,6 +274,29 @@ function nextTrivia() {
   // clearRound();
 }
 
+async function restartTrivia()
+{
+  // triviaQuestions = await createQuestions();
+
+  console.log("restarting");
+  resetAnswered();
+  resetWinners();
+
+  await createQuestions();
+  // endTime = performance.now() + 1000*countdownTime;
+  resetTimer();
+  triviaIndex = 0;
+  multipleChoice();
+
+  const scoreCard = document.getElementById("score");
+  question = document.createElement("img");
+  question.src = `/Movie-Tracker/bg/${triviaQuestions[0].question}`;
+  question.id = "question";
+
+  scoreCard.replaceWith(question);
+  // triviaDiv.appendChild(question);
+  timer.innerText = countdownTime;
+}
 
 function restartTimer() {
   const countdown = timer.innerText;
@@ -392,7 +415,9 @@ async function loadTMDB()
 
 async function createQuestions()
 {
-  tmdbList = await loadTMDB();
+  if (!tmdbList) {
+    tmdbList = await loadTMDB();
+  }
 
   let indexArr = new Array(questionCount);
   for (let i = 0; i < questionCount; i++) {
@@ -450,6 +475,11 @@ function parseTriviaChat(name, outmsg)
 function resetAnswered()
 {
   answered = [];  //reset so same people can answer again
+}
+
+function resetWinners()
+{
+  winners = [];
 }
 
 function createAnswers()
@@ -653,13 +683,24 @@ function showScore()
   }, 10);
   // console.log("answer:", answBtn.innerText);
   answerBtn.onclick = ()=>{
-    location.reload();
+    nextBtn.disabled = false;
+    prevBtn.disabled = false;
+    playBtn.disabled = false;
+    setTimeout(()=>{
+      answerBtn.innerText = "Answer";
+    }, 10);
+
+    restartTrivia();
+    // location.reload();
   }
 
-  triviaDiv.removeChild(document.getElementById("question"));
+  // triviaDiv.removeChild(document.getElementById("question"));
   const scoreCard = document.createElement("table");
-  triviaDiv.appendChild(scoreCard);
+  // triviaDiv.appendChild(scoreCard);
   scoreCard.className = "scoreCard";
+  scoreCard.id        = "score";
+
+  question.replaceWith(scoreCard);
 
   const scoreArr = Object.entries(score);
   scoreArr.sort((a, b)=>{
@@ -670,8 +711,8 @@ function showScore()
     const row = document.createElement("tr");
     const td1 = document.createElement("td");
     const td2 = document.createElement("td");
-    td1.innerText = e[0];
     td1.className = "scoreName";
+    td1.innerText = e[0];
 
     const r = Math.floor(Math.random()*255);
     const g = Math.floor(Math.random()*255);

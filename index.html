@@ -6,6 +6,11 @@
       background-color: rgb(30, 30, 30);
       /* background-color: #0D191D; */
     }
+    /* body {
+      display: flex;
+      align-content: center;
+      margin-left: 500px;
+    } */
     .timer {
       position: static;
       font-size: 48px;
@@ -132,6 +137,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      text-align: center;
     }
 
     .titleConnect {
@@ -148,7 +154,8 @@
       z-index: 1;
     }
     .gameboard {
-      margin-left: 80px;
+      max-width: fit-content;
+      margin-inline: auto;
     }
 
 
@@ -218,6 +225,7 @@
     }
     .tooltip:hover .tooltiptext {
       opacity: 1;
+      /* position: relative; */
     }
 
 
@@ -266,12 +274,12 @@
       <div id="title" class="triviaTitle">Name That Movie!</div>
       <button id="connectChatBtn" class="connectBtn">Connect to Twitch Chat</button>
     </div>
-  
+
     <div id="triviaChat" class="triviaChat">
       <div id="trivia" class="trivia" data-idx="0"></div>
       <div id="twitchChat" class="twitchChat"></div>
     </div>
-  
+
     <div id="buttons">
       <button id="prev"  >&lt;&lt;</button>
       <button id="pause" >Pause</button>
