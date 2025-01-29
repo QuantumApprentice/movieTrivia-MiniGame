@@ -288,6 +288,8 @@ async function restartTrivia()
   triviaIndex = 0;
   multipleChoice();
 
+  const title = document.getElementById("title");
+  title.innerText = "Name That Movie";
   const scoreCard = document.getElementById("score");
   question = document.createElement("img");
   question.src = `/Movie-Tracker/bg/${triviaQuestions[0].question}`;

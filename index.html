@@ -4,28 +4,32 @@
   <style>
     *{
       background-color: rgb(30, 30, 30);
-      /* background-color: #0D191D; */
+      box-sizing: border-box;
     }
-    /* body {
-      display: flex;
-      align-content: center;
-      margin-left: 500px;
-    } */
-    .timer {
-      position: static;
+    html, body {
+      margin: 0;
+      padding: 0;
+    }
+
+
+    #timer {
+      /* position: static; */
+      position: absolute;
       font-size: 48px;
       color: aliceblue;
       background-color: blue;
       border-radius: 15px;
-      /* text-shadow: -5px -5px 0 black; */
-      /* -webkit-text-fill-color: black; */
-      /* -webkit-text-stroke: 1px black; */
     }
-    button {
+    #buttons {
+      display: flex;
+    }
+    #buttons > button {
+      flex: 1;
       color: aliceblue;
-      width: 100px;
-      height: 50px;
-      font-size: 24px;
+      width: 23vw;
+      height: 7vh;
+      font-size: 18px;
+      font-weight: bold;
       border: solid;
     }
     button:disabled {
@@ -33,23 +37,22 @@
       color: black;
     }
     .trivia {
-      width: 500px;
-      height: 400px;
+      /* width: 50vh; */
+      /* width: 500px; */
+      /* height: 400px; */
     }
-    img {
-      width: 500px;
-      height: 400px;
+    .trivia > img {
+      /* width: 100vw; */
+      /* max-height: 50vh; */
+      height: 50vh;
       object-fit: scale-down;
-
     }
     .triviaTitle {
       background-color: rgb(70, 16, 120);
       width: 500px;
-      font-size: 48px;
+      font-size: 24px;
       text-align: center;
       color: aliceblue;
-      white-space: nowrap;
-
     }
     .scoreCard {
       width: 500px;
@@ -75,7 +78,7 @@
       background-color: rgb(70, 16, 120);
     }
     .choiceDiv >:nth-child(2) {
-      background-color: rgb(0, 89, 24);
+      background-color: rgb(0, 52, 14);
     }
     .choiceDiv >:nth-child(3) {
       background-color: rgb(11, 29, 145);
@@ -100,25 +103,26 @@
     .triviaChat {
       display: flex;
       width: 700px;
+      height: 50vh;
     }
     .twitchChat {
       display: flex;
       flex-direction: column-reverse;
       background-color: black;
       width: 200px;
-      height: 400px;
     }
     .winner {
       background-color: blue;
     }
 
     .choiceBtn {
-      width: 700px;
-      height: 80px;
+      width: 100vw;
+      height: 9vh;
       display: flex;
       flex-direction: row;
       align-content: space-between;
       background-color: black;
+
     }
     .choiceBtn:hover {
       background-color:lightslategray;
@@ -132,12 +136,17 @@
     .choice {
       width: 700px;
       background-color: inherit;
-      font-size: 32px;
-      color: aqua;
       display: flex;
       justify-content: center;
       align-items: center;
       text-align: center;
+      color: aqua;
+      color: yellow;
+      font-size: 3.5vh;
+      font-weight: 500;
+      line-height: 1;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      text-shadow: 2px 2px 2px #000;
     }
 
     .titleConnect {
@@ -152,26 +161,30 @@
       font-weight: bold;
       line-height: 100%;
       z-index: 1;
+      display: none;
     }
     .gameboard {
       max-width: fit-content;
+      /* max-width: min-content; */
+      /* width: min-content; */
       margin-inline: auto;
     }
 
 
     .hamburger {
       position: fixed;
-      margin-top: 5px;
-      border: solid red;
+      margin-top: 0px;
+      /* border: solid red; */
+      border: #00000000;
       pointer-events: auto;
-      width: 65px;
-      height: 60px;
+      width: 50px;
+      height: 40px;
     }
     .hamburger > * { /*hamburger slices*/
-      width: 35px;
-      height: 7px;
+      width: 25px;
+      height: 5px;
       background-color: gray;
-      margin: 7px;
+      margin: 5px;
       transition: .5s;
     }
     .hamburger.change > :nth-child(1) {
@@ -229,6 +242,35 @@
     }
 
 
+
+
+    @media only screen and (min-width:480px) {
+      .triviaTitle {
+        font-size: 48px;
+        white-space: nowrap;
+      }
+      #buttons > button{
+        width: 100px;
+        height: 50px;
+        font-size: 24px;
+      }
+      #connectChatBtn {
+        /* width: ; */
+        display:block
+      }
+      .choiceBtn {
+        height: 10vh;
+        width: 700px;
+      }
+      .hamburger > * { /*hamburger slices*/
+        width: 35px;
+        height: 7px;
+        background-color: gray;
+        margin: 7px;
+        transition: .5s;
+      }
+    }
+
   </style>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -267,6 +309,7 @@
       <label>s per Answer</label>
     </div>
     <input id="twitchName" class="twitchName" placeholder="twitch chat"></input>
+    <button id="hamburgerConnectChat" class="connectBtn">Connect to Twitch Chat</button>
   </div>
 
   <div class="gameboard">
@@ -276,6 +319,7 @@
     </div>
 
     <div id="triviaChat" class="triviaChat">
+      <label id="timer"></label>
       <div id="trivia" class="trivia" data-idx="0"></div>
       <div id="twitchChat" class="twitchChat"></div>
     </div>
@@ -287,7 +331,6 @@
       <button id="next"  >&gt;&gt;</button>
     </div>
     <div>
-      <label id="timer" class="timer"></label>
       <label id="fps"></label>
     </div>
     <div id="choiceDiv" class="choiceDiv"></div>
