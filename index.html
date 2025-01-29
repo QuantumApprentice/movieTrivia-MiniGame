@@ -42,7 +42,7 @@
       /* height: 400px; */
     }
     .trivia > img {
-      /* width: 100vw; */
+      max-width: 100vw;
       /* max-height: 50vh; */
       height: 50vh;
       object-fit: scale-down;
@@ -261,6 +261,14 @@
       .choiceBtn {
         height: 10vh;
         width: 700px;
+      }
+      .hamburger {
+        position: fixed;
+        margin-top: 5px;
+        border: solid red;
+        pointer-events: auto;
+        width: 65px;
+        height: 60px;
       }
       .hamburger > * { /*hamburger slices*/
         width: 35px;
