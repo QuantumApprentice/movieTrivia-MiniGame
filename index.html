@@ -67,21 +67,21 @@
     .scoreAmount {
       font-size: 32px;
     }
-    #choiceDiv {
+    .choiceDiv {
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
     }
-    #choiceDiv >:nth-child(1) {
+    .choiceDiv >:nth-child(1) {
       background-color: rgb(11, 29, 145);
     }
-    #choiceDiv >:nth-child(2) {
+    .choiceDiv >:nth-child(2) {
       background-color: rgb(0, 52, 14);
     }
-    #choiceDiv >:nth-child(3) {
+    .choiceDiv >:nth-child(3) {
       background-color: rgb(70, 16, 120);
     }
-    #choiceDiv >:nth-child(4) {
+    .choiceDiv >:nth-child(4) {
       background-color: rgb(85, 0, 0);
     }
 
@@ -100,17 +100,10 @@
       color:blueviolet;
       background-color: black;
     }
-    /* #triviaTimer {
-      display: flex;
-      width: 700px;
-      height: 50vh;
-    } */
     #twitchChat {
       display: flex;
       flex-direction: column-reverse;
       background-color: black;
-      /* width: 200px; */
-      /* width: 25vw; */
       width: 100vw;
       height: 50vh;
     }
@@ -124,8 +117,6 @@
       display: flex;
       flex-direction: row;
       align-content: space-between;
-      background-color: black;
-
     }
     .choiceBtn:hover {
       background-color:lightslategray;
@@ -136,7 +127,10 @@
       background-color: inherit;
       align-content: center;
     }
-    .choice {
+    .choiceNum:hover {
+      background-color: #000;
+    }
+    .choiceTxt {
       width: 100vw;
       background-color: inherit;
       display: flex;
@@ -315,7 +309,7 @@
         height: 12vh;
         width: 30vw;
       }
-      .choice {
+      .choiceTxt {
         height:12vh;
       }
 
@@ -404,7 +398,7 @@
       </div>
 
 
-      <div id="choiceDiv"></div>
+      <div id="choiceDiv" class="choiceDiv"></div>
     </div>
 
 

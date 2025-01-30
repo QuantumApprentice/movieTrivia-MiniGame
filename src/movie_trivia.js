@@ -646,7 +646,7 @@ function multipleChoice() {
     choiceBtnDiv.id = `${i+1}`;
 
     const choiceAns = document.createElement("div");
-    choiceAns.className = "choice";
+    choiceAns.className = "choiceTxt";
     choiceAns.innerText = `${ansArr[i].answer}`;
 
     const choiceNum = document.createElement("div");
