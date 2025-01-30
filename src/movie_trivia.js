@@ -715,6 +715,7 @@ function showScore()
       answerBtn.innerText = "Answer";
     }, 10);
 
+    initButtons();
     restartTrivia();
     // location.reload();
   }
