@@ -628,7 +628,7 @@ function createAnswers()
 
 function multipleChoice() {
   const choiceDiv = document.getElementById("choiceDiv");
-  choiceDiv.innerHTML = "";
+  choiceDiv.innerHTML = "";   //clear previous answer choices
 
   // const timeStart = performance.now();
   const ansArr = createAnswers();
@@ -650,13 +650,13 @@ function multipleChoice() {
     choiceAns.innerText = `${ansArr[i].answer}`;
 
     const choiceNum = document.createElement("div");
-    choiceNum.innerText = `${i+1}`;
     choiceNum.className = "choiceNum";
+    choiceNum.innerText = `${i+1}`;
 
     choiceBtnDiv.append(choiceNum);
     choiceBtnDiv.append(choiceAns);
-    choiceBtnDiv.onclick = handleClick;
 
+    choiceBtnDiv.onclick = handleClick;
     choiceBtnArr.push(choiceBtnDiv);
   }
 
@@ -671,6 +671,10 @@ function multipleChoice() {
         endTime = performance.now();
         timer.innerText = triviaQuestions[triviaIndex].answer;
         score["Me"] = score["Me"] ? (score["Me"]+=1) : 1;
+        e.target.parentElement.style = "background-color: lightslategray; border: solid red;";
+        // console.log("e",e.target.parentElement);
+
+        // e.target.style = "border: solid red;";
       }
       // console.log("found");
     }
