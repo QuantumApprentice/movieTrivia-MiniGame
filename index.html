@@ -266,6 +266,7 @@
     /* for screens wider than 480px */
     @media only screen and (min-width:480px) {
       .gameboardChat {
+        align-content: center;
         flex-direction: row;
       }
       .gameboard {
@@ -277,7 +278,7 @@
         display: flex;
         /* display: grid; */
         flex-direction: row-reverse;
-        justify-content: flex-end;
+        justify-content: center;
         /* align-content: flex-end; */
       }
 
@@ -292,13 +293,14 @@
         /* height: 50vh; */
         height: auto;
         object-fit: scale-down;
+        /* object-fit: contain; */
       }
 
       #twitchChat {
         display: flex;
         flex-direction: column-reverse;
         background-color: black;
-        width: 30vw;
+        width: 20vw;
       }
 
       #buttons {
