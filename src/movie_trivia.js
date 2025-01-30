@@ -176,10 +176,34 @@ function initButtons()
     if (e.key === "Enter") {
       e.stopPropagation();
       // console.log("val",e.target.value);
+
+
+
+
+      if (!e.target.value) {
+        let chatMSG = document.createElement("div");
+        let auth = document.createElement("div");
+        parseChatCallback("TriviaBot",
+                          `No channel-name provided.`,
+                          auth, chatMSG);
+        return;
+      }
+
       if (connectBtn.innerText === "Connect to Twitch Chat") {
         connectBtn.innerText = "Disconnect";
+        startChat(e.target.value, parseChatCallback);
+      } else {
+        twitchChatWS.onclose = ()=>{
+          connectBtn.innerText = "Connect to Twitch Chat";
+  
+          let chatMSG = document.createElement("div");
+          let auth = document.createElement("div");
+          parseChatCallback("TriviaBot",
+            `Disconnected from twitch chat.`,
+            auth, chatMSG);
+        }
+        twitchChatWS.close();
       }
-      startChat(e.target.value, parseChatCallback);
     }
   });
   connectBtn.onclick = (e)=>{
@@ -209,7 +233,6 @@ function initButtons()
           auth, chatMSG);
       }
       twitchChatWS.close();
-
     }
   }
 
