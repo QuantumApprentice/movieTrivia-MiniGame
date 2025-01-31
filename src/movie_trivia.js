@@ -85,15 +85,21 @@ async function play_trivia()
   triviaDiv.appendChild(question);
   timer.innerText = countdownTime;
 
-  // function updateButtons() {
-  //   const playBtn   = document.getElementById("pause");
-  //   if (timerState === "paused") {
-  //     playBtn.innerText = "Play";
-  //   }
-  //   if (timerState === "running") {
-  //     playBtn.innerText = "Pause";
-  //   }
-  // }
+  function updateButtons() {
+    if (triviaIndex === 0 || triviaIndex == triviaCount-1) {
+      //disable prevBtn if on first trivia or score screen
+      prevBtn.disabled = true;
+    } else {
+      prevBtn.disabled = false;
+    }
+    // const playBtn   = document.getElementById("pause");
+    // if (timerState === "paused") {
+    //   playBtn.innerText = "Play";
+    // }
+    // if (timerState === "running") {
+    //   playBtn.innerText = "Pause";
+    // }
+  }
 
   function updateTimer() {
     playBtn.innerText = "Pause";
@@ -116,10 +122,10 @@ async function play_trivia()
   function stateMachine() {
     if (timerState !== prevState) {
       prevState = timerState;
-      // updateButtons();
     }
     if (timerState !== "paused") {
       updateTimer();
+      updateButtons();
     }
     requestAnimationFrame(stateMachine);
   }
