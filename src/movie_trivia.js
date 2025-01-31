@@ -50,6 +50,7 @@ const twitchName = document.getElementById("twitchName");
 const triviaDiv  = document.getElementById("trivia");
 const connectBtn = document.getElementById("connectChatBtn");
 const timer      = document.getElementById("timer");
+const sound      = document.getElementById("sound");
 let   question   = document.createElement("img");
 
 
@@ -174,6 +175,17 @@ function initButtons()
   nextBtn.onclick = ()=>{
     nextTrivia();
     answerBtn.innerText = "Answer";
+  }
+
+  //sound button
+  sound.onclick = (e)=>{
+    if (e.currentTarget.classList.value === "soundOn") {
+      e.currentTarget.classList = "soundOff";
+      document.getElementById("sadTrombone").muted = true;
+    } else {
+      e.currentTarget.classList = "soundOn";
+      document.getElementById("sadTrombone").muted = false;
+    }
   }
 
   //twitch chat connection stuff
