@@ -663,7 +663,7 @@ function multipleChoice() {
 
   //onClick for the right answer only
   //(maybe add wrong answer stuff?)
-  function handleClick(e) {
+  function  handleClick(e) {
     //if button has the correct answer...
     if (e.target.firstChild.data === triviaQuestions[triviaIndex].answer) {
       //display correct answer in timer
@@ -676,9 +676,11 @@ function multipleChoice() {
         //TODO: wtf? why isn't this pointing
         //      to the parent element directly?
         e.target.parentElement.style = "background-color: lightslategray; border: solid red;";
-        console.log("e",e);
-
+        const sadTrombone = document.getElementById("sadTrombone");
+        sadTrombone.play();
       }
+    } else {
+      e.target.parentElement.style = `background-color: `
     }
   }
 
