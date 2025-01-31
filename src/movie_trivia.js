@@ -290,7 +290,9 @@ function nextTrivia() {
     return;
   }
   //change the trivia question.src to match new index
-  question.src = `/Movie-Tracker/bg/${triviaQuestions[triviaIndex].question}`;
+  // question.src = `/Movie-Tracker/bg/${triviaQuestions[triviaIndex].question}`;
+  question.src = `https://quantumapprentice.github.io/Movie-Tracker/bg/${triviaQuestions[triviaIndex].question}`;
+
   //reset for next round
   resetTimer();
   multipleChoice();
@@ -655,7 +657,6 @@ function multipleChoice() {
 
     choiceBtnDiv.append(choiceNum);
     choiceBtnDiv.append(choiceAns);
-
     choiceBtnDiv.onclick = handleClick;
     choiceBtnArr.push(choiceBtnDiv);
   }
@@ -671,12 +672,13 @@ function multipleChoice() {
         endTime = performance.now();
         timer.innerText = triviaQuestions[triviaIndex].answer;
         score["Me"] = score["Me"] ? (score["Me"]+=1) : 1;
+
+        //TODO: wtf? why isn't this pointing
+        //      to the parent element directly?
         e.target.parentElement.style = "background-color: lightslategray; border: solid red;";
         // console.log("e",e.target.parentElement);
 
-        // e.target.style = "border: solid red;";
       }
-      // console.log("found");
     }
   }
 
@@ -721,7 +723,6 @@ function showScore()
 
     initButtons();
     restartTrivia();
-    // location.reload();
   }
 
   // triviaDiv.removeChild(document.getElementById("question"));
