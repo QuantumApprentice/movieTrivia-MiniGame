@@ -125,7 +125,6 @@
       display: flex;
       flex-direction: row;
       align-content: space-between;
-      pointer-events: auto;
     }
     .choiceBtn:not(.disabledChoice):hover {
       cursor: pointer;
@@ -136,11 +135,10 @@
       color: chocolate;
       background-color: inherit;
       align-content: center;
-      pointer-events: none;
     }
-    .choiceNum:hover {
+    /* .choiceNum:hover {
       background-color: #000;
-    }
+    } */
     .choiceTxt {
       width: 100vw;
       background-color: inherit;
@@ -193,8 +191,6 @@
     }
     .gameboard {
       max-width: fit-content;
-      /* max-width: min-content; */
-      /* width: min-content; */
       margin-inline: auto;
     }
     .gameboardChat {

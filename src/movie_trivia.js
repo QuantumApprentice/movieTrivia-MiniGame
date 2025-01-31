@@ -669,23 +669,27 @@ function multipleChoice() {
   //onClick for the right answer only
   //(maybe add wrong answer stuff?)
   function  handleClick(e) {
+    // console.log("e",e.currentTarget);
     //if button has the correct answer...
-    if (e.target.firstChild.data === triviaQuestions[triviaIndex].answer) {
+    if (e.currentTarget.lastChild.textContent === triviaQuestions[triviaIndex].answer) {
       //display correct answer in timer
       if (answerBtn.innerText !== "Next") {
         answerBtn.innerText = "Next";
         endTime = performance.now();
         timer.innerText = triviaQuestions[triviaIndex].answer;
-        score["Me"] = score["Me"] ? (score["Me"]+=1) : 1;
+        score["Me"] = score["Me"] ? (score["Me"]+1) : 1;
 
         //TODO: wtf? why isn't this pointing
         //      to the parent element directly?
-        e.target.parentElement.style = "background-color: lightslategray; border: solid red;";
+        //Answer: currentTarget actually points to the current element
+        //      but it's null if just logging out "e"
+        //      need to log out currentTarget to see
+        e.currentTarget.classList.add("winnerChoice");
         const sadTrombone = document.getElementById("sadTrombone");
         sadTrombone.play();
       }
     } else {
-      e.target.parentElement.classList.add("wrongChoice");
+      e.currentTarget.classList.add("wrongChoice");
       choiceBtnArr.forEach(e => {
         e.classList.add("disabledChoice");
         e.onclick = {};
