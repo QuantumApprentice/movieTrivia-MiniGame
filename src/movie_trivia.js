@@ -408,6 +408,9 @@ function parseChatCallback(name, outmsg, auth, chatMSG)
     if (winner.won) {
       msg.classList.add("winner");
       auth.classList.add("winner");
+      document.getElementById(`${Number(outmsg)}`).classList.add("winnerChoice");
+      document.getElementById("sadTrombone").play();
+
     }
     msg.innerText += winner.str;
 
@@ -640,16 +643,12 @@ function multipleChoice() {
 
   // const timeStart = performance.now();
   const ansArr = createAnswers();
-  // console.log("ans", ansArr);
-  // console.log("total time: ", performance.now() - timeStart);
 
   //create array of answer buttons - choiceBtnArr[]
   //and fill with ansArr[] answers
   let choiceBtnArr = [];
   for (let i = 0; i < 4; i++) {
     const choiceBtnDiv = document.createElement("div");
-    // choiceBtnDiv.innerHTML = `<div class="choiceBtn" id=${i}></div>`
-    // choiceDiv.innerHtml = `<div class="choice choice1">...</div><div class="choice choice2">...</div>`;
     choiceBtnDiv.className = "choiceBtn";
     choiceBtnDiv.id = `${i+1}`;
 
@@ -686,7 +685,11 @@ function multipleChoice() {
         sadTrombone.play();
       }
     } else {
-      e.target.parentElement.style = `background-color: `
+      e.target.parentElement.classList.add("wrongChoice");
+      choiceBtnArr.forEach(e => {
+        e.classList.add("disabledChoice");
+        e.onclick = {};
+      });
     }
   }
 
