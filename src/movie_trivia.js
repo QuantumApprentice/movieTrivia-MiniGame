@@ -676,7 +676,7 @@ function multipleChoice() {
         //TODO: wtf? why isn't this pointing
         //      to the parent element directly?
         e.target.parentElement.style = "background-color: lightslategray; border: solid red;";
-        // console.log("e",e.target.parentElement);
+        console.log("e",e);
 
       }
     }

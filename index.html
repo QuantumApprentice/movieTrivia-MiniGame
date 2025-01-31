@@ -24,6 +24,9 @@
     #buttons {
       display: flex;
     }
+    /* #buttons:hover {
+      cursor: pointer;
+    } */
     #buttons > button {
       /* flex: 1; */
       color: aliceblue;
@@ -33,7 +36,7 @@
       font-weight: bold;
       border: solid;
     }
-    button:disabled {
+    #buttons > button:disabled {
       border-color: black;
       color: black;
     }
@@ -122,6 +125,7 @@
       display: flex;
       flex-direction: row;
       align-content: space-between;
+      pointer-events: auto;
     }
     #choiceDiv > .choiceBtn:hover {
       cursor: pointer;
@@ -132,7 +136,7 @@
       color: chocolate;
       background-color: inherit;
       align-content: center;
-      /* pointer-events: none; */
+      pointer-events: none;
     }
     .choiceNum:hover {
       background-color: #000;
@@ -300,12 +304,6 @@
         flex-direction: column-reverse;
         background-color: black;
         width: 15vw;
-      }
-
-      #everythingElse {
-        /* display: flex; */
-        /* align-items: space-between; */
-        /* justify-content: space-between; */
       }
 
       #buttons {
