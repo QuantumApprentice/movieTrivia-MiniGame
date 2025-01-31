@@ -190,7 +190,7 @@ function initButtons()
         let chatMSG = document.createElement("div");
         let auth = document.createElement("div");
         parseChatCallback("TriviaBot",
-                          `No channel-name provided.`,
+                          `No channel-name provided. Add a channel name in ☰ Options.`,
                           auth, chatMSG);
         return;
       }
@@ -219,7 +219,7 @@ function initButtons()
       let chatMSG = document.createElement("div");
       let auth = document.createElement("div");
       parseChatCallback("TriviaBot",
-                        `No channel-name provided.`,
+                        `No channel-name provided. Add a channel name in ☰ Options.`,
                         auth, chatMSG);
       return;
     }
