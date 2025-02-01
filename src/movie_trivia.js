@@ -80,8 +80,22 @@ async function play_trivia()
   initButtons();
   endTime = performance.now() + 1000*countdownTime;
 
-  // question.src = `assets/${triviaQuestions[0].question}`;
-  question.src = `/Movie-Tracker/bg/${triviaQuestions[0].question}`;
+  // question.src = `/Movie-Tracker/bg/${triviaQuestions[0].question}`;
+  question.src = await getTriviaURL(0);
+  // question.src = `/assets/junior-1994-0.gif`;
+  // let p = await new Promise((res)=>{
+  //   question.addEventListener('load', ()=>{
+  //     console.log("qa",question);
+  //     res(true);
+  //   });
+  //   question.addEventListener('error',()=>{
+  //     console.log("qb",question);
+  //     res(false);
+  //   });
+  // });
+  // console.log("p",await p);
+  // question.src = `https://quantumapprentice.github.io/movieTrivia-MiniGame/assets/junior-1994-1.gif`
+
   question.id = "question";
   triviaDiv.appendChild(question);
   timer.innerText = countdownTime;
@@ -135,6 +149,49 @@ async function play_trivia()
   stateMachine();
 }
 
+async function getTriviaURL(index)
+{
+  let baseURL = `https://quantumapprentice.github.io/Movie-Tracker/bg/${triviaQuestions[index].question}`;
+  // let baseURL = `/Movie-Tracker/bg/${triviaQuestions[index].question}`;
+  let imageName = triviaQuestions[index].question.slice(0,-4);
+  // let imageName = `junior-1994.jpg`.slice(0,-4);
+  // console.log("i",imageName);
+
+  const img = new Image();
+  let difficulty = 0;
+  let temp;
+  let p = false;
+  while (!p && difficulty < 3) {
+    temp = `/assets/${imageName}-${difficulty++}.gif`;
+    img.src = temp;
+    p = await new Promise(res=>{
+      img.addEventListener('load', ()=>res(true) );
+      img.addEventListener('error',()=>res(false));
+    });
+  }
+
+  if (p) {
+    console.log('t',temp);
+    return temp;
+  }
+
+  return baseURL;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 function initButtons()
 {
   //answer/next
@@ -160,12 +217,13 @@ function initButtons()
     }
   }
   //next >>
-  prevBtn.onclick = ()=>{
+  prevBtn.onclick = async ()=>{
     triviaIndex -= 1;
     if (triviaIndex < 0) {
       triviaIndex = triviaQuestions.length-1;
     }
-    question.src = `/Movie-Tracker/bg/${triviaQuestions[triviaIndex].question}`;
+    // question.src = `/Movie-Tracker/bg/${triviaQuestions[triviaIndex].question}`;
+    question.src = await getTriviaURL(triviaIndex);
     resetTimer();
     multipleChoice();
     // clearRound();
@@ -299,7 +357,7 @@ function initButtons()
 
 //get the next trivia entry and fill
 //the question.src with new entry
-function nextTrivia() {
+async function nextTrivia() {
   triviaIndex += 1;
   if (triviaIndex >= triviaQuestions.length) {
     timerState = "paused";
@@ -309,7 +367,8 @@ function nextTrivia() {
   }
   //change the trivia question.src to match new index
   // question.src = `/Movie-Tracker/bg/${triviaQuestions[triviaIndex].question}`;
-  question.src = `https://quantumapprentice.github.io/Movie-Tracker/bg/${triviaQuestions[triviaIndex].question}`;
+  // question.src = `https://quantumapprentice.github.io/Movie-Tracker/bg/${triviaQuestions[triviaIndex].question}`;
+  question.src = await getTriviaURL(triviaIndex);
 
   //reset for next round
   resetTimer();
@@ -335,7 +394,8 @@ async function restartTrivia()
   title.innerText = "Name That Movie";
   const scoreCard = document.getElementById("score");
   question = document.createElement("img");
-  question.src = `/Movie-Tracker/bg/${triviaQuestions[0].question}`;
+  // question.src = `/Movie-Tracker/bg/${triviaQuestions[0].question}`;
+  question.src = await getTriviaURL(0);
   question.id = "question";
 
   scoreCard.replaceWith(question);
@@ -571,6 +631,19 @@ function createAnswers()
   for (let i = 1; i <= 3; i += 1) {
     let wrongAnswer;
     while (answersB.includes(wrongAnswer)) {
+
+    //TODO: might need to swap out this while loop
+    //      for something that deep checks objects?
+    // while (answersB.find((e)=>{
+    //   console.log("e",e);
+    //   if (!e) {
+    //     return false;
+    //   }
+    //   return (e?.answer === wrongAnswer?.answer);
+    // })) {
+
+
+
       //get another random answer and 
       //set it at index (answerIndex + i) % 4
       let rng = Math.floor(Math.random() * tmdbList.length);
