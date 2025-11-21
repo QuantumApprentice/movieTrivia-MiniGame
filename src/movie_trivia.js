@@ -53,7 +53,19 @@ const timer      = document.getElementById("timer");
 const sound      = document.getElementById("sound");
 let   question   = document.createElement("img");
 
-
+// BakerStaunch
+// Object.entries(props || {})).forEach(([k, v]) => el[k] = v);
+// is equivalent to 
+// for (let entry of Object.entries(props || {})) {
+//   let k = entry[0];
+//   let v = entry[1];
+//   el[k] = v;
+// }
+// That code is the same as 
+// question = Object.assign(
+//   document.createElement('img'), {
+//     src: await getTriviaURL(0), id: "question"
+// })
 
 let maxMsgCount   = 5;
 let countdownTime = 30;
@@ -80,19 +92,8 @@ async function play_trivia()
   initButtons();
   endTime = performance.now() + 1000*countdownTime;
 
-  // question.src = `/Movie-Tracker/bg/${triviaQuestions[0].question}`;
   question.src = await getTriviaURL(0);
-  // question.src = `/assets/junior-1994-0.gif`;
-  // let p = await new Promise((res)=>{
-  //   question.addEventListener('load', ()=>{
-  //     console.log("qa",question);
-  //     res(true);
-  //   });
-  //   question.addEventListener('error',()=>{
-  //     console.log("qb",question);
-  //     res(false);
-  //   });
-  // });
+
   // console.log("p",await p);
   // question.src = `https://quantumapprentice.github.io/movieTrivia-MiniGame/assets/junior-1994-1.gif`
 
